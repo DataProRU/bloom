@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" sizes="180x120" href="https://raw.githubusercontent.com/PavelErsh/images/refs/heads/main/bg.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
     <title>Форма для операции</title>
     <style>
         /* Ваши стили остаются без изменений */
@@ -232,7 +236,7 @@
 <body>
 <div class="form-container">
     <div class="header">
-        <img alt="Логотип" src="https://raw.githubusercontent.com/PavelErsh/images/refs/heads/main/bg.png">
+        <img alt="Логотип" src="/static/img/лого.png">
         <h1>Финансовый отчёт</h1>
     </div>
     <form id="financialForm">
@@ -286,7 +290,7 @@
                 </select>
             </div>
             <div>
-                <label for="account_type">Статья:</label>
+                <label for="account_type">Контрагенты:</label>
                 <select id="account_type" name="account_type" required>
                     <option disabled selected value="">Выберите статью</option>
                 </select>
