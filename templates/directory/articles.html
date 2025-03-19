@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Управление статьями</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f8fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2a6fb3;
+        }
+
+        table {
+            width: 60%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            width: 90%;
+        }
+
+        th {
+            background-color: #2a6fb3;
+            color: white;
+        }
+
+        td {
+            background-color: #f9fbff;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #eef5fc;
+        }
+
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        button:active {
+            background-color: #285a8e;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #2a6fb3;
+        }
+
+        .modal-content button {
+            width: auto;
+        }
+
+        .modal-content .close {
+            background: #e74c3c;
+            color: white;
+            float: right;
+            padding: 5px 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+        }
+
+        .modal-content .close:hover {
+            background: #c0392b;
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+
+        form input, form select, form button {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        form button {
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .fixed-width-button {
+            height: 70%;
+            width: 100px; /* Adjust the width as needed */
+        }
+
+        /* Styles for the select element */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: white;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144"><path fill="%23333" d="M43.04 80.04l53.38 53.38c.78.78 2.05.78 2.83 0l10.94-10.94c.78-.78.78-2.05 0-2.83L63.6 59.38c-.78-.78-2.05-.78-2.83 0L30.2 80.04c-.78.78-.78 2.05 0 2.83l10.94 10.94c.39.39.92.59 1.46.59.54 0 1.08-.2 1.46-.59z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Управление статьями</h1>
+<div style="text-align: right; margin-bottom: 20px; margin-right: 20px;">
+    <a href="/directory">
+        <button>Назад</button>
+    </a>
+</div>
+
+<div style="text-align: center; margin-bottom: 20px;">
+    <button onclick="showModal('add-modal')">Добавление новой статьи</button>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Название статьи</th>
+        <th>Операция</th>
+        <th>Категория</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for article in articles %}
+    <tr>
+        <td>{{ article.title }}</td>
+        <td>{{ article.category_operation }}</td>
+        <td>{{ article.category_name }}</td>
+        <td class="action-buttons">
+            <button class="fixed-width-button" onclick="showEditForm({{ article.id }}, '{{ article.title }}')">
+                Изменить
+            </button>
+            <form action="/articles/{{ article.id }}/delete/" method="post" style="display:inline;">
+                <button class="fixed-width-button" onclick="return confirm('Вы точно хотите удалить эту статью?');"
+                        type="submit">Удалить
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="modal" id="add-modal">
+    <div class="modal-content">
+        <button class="close" onclick="closeModal('add-modal')">&times;</button>
+        <h2>Добавление новой статьи</h2>
+        <form action="/articles/add/" method="post">
+            <label for="new-article-title">Название статьи:</label>
+            <input id="new-article-title" name="title" required type="text">
+            <label for="new_article_category_operation">Операция:</label>
+            <select id="new_article_category_operation" name="category_operation" required>
+                <option disabled selected value="">Выберите операцию</option>
+                {% for operation in operations %}
+                <option value="{{ operation.name }}">{{ operation.name }}</option>
+                {% endfor %}
+            </select>
+            <label for="new_article_category">Категория:</label>
+            <select id="new_article_category" name="category_name" required>
+                <option disabled selected value="">Выберите тип учета</option>
+                {% for category in categories %}
+                <option value="{{ category.name }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="edit-modal">
+    <div class="modal-content">
+        <button class="close" onclick="closeModal('edit-modal')">&times;</button>
+        <h2>Изменение статьи</h2>
+        <form id="edit-form" method="post">
+            <input id="edit-article-id" name="user_id" type="hidden">
+            <label for="edit-article-title">Название статьи:</label>
+            <input id="edit-article-title" name="title" required type="text">
+            <label for="edit_article_category_operation">Операция:</label>
+            <select id="edit_article_category_operation" name="category_operation" required>
+                <option disabled selected value="">Выберите операцию</option>
+                {% for operation in operations %}
+                <option value="{{ operation.name }}">{{ operation.name }}</option>
+                {% endfor %}
+            </select>
+            <label for="edit_article_category">Категория:</label>
+            <select id="edit_article_category" name="category_name" required>
+                <option disabled selected value="">Выберите тип учета</option>
+            </select>
+            <button type="submit">Сохранить изменения</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const operationCategories = {{ operation_categories|tojson }};
+
+    document.getElementById('new_article_category_operation').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        const categorySelect = document.getElementById('new_article_category');
+        categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
+
+        if (operationCategories[selectedCategory]) {
+            operationCategories[selectedCategory].forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+    });
+
+    document.getElementById('edit_article_category_operation').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        const categorySelect = document.getElementById('edit_article_category');
+        categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
+
+        if (operationCategories[selectedCategory]) {
+            operationCategories[selectedCategory].forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+    });
+
+    function showModal(modalId) {
+        document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    function showEditForm(id, title) {
+        const modal = document.getElementById('edit-modal');
+        const form = document.getElementById('edit-form');
+
+        document.getElementById('edit-article-id').value = id;
+        document.getElementById('edit-article-title').value = title;
+
+        form.action = `/articles/${id}/edit/`;
+
+        modal.classList.add('active');
+    }
+</script>
+</body>
+</html>
