@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Вход</title>
+    <link href="/static/style.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .form-wrapper {
+            max-width: 400px;
+            width: 100%;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            /* Прозрачный фон */
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            /* Мягкая тень */
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-wrapper:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            /* Эффект при наведении */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        label {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #00aaff;
+            /* Цвет границы при фокусе */
+        }
+
+        #password-strength {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        button {
+            cursor: pointer;
+            width: 100%;
+            padding: 12px;
+            background-color: #00aaff;
+            /* Основной цвет кнопки */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #008fcc;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #error-message {
+            color: red;
+            text-align: center;
+            display: none;
+        }
+
+        p {
+            color: red;
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body>
+<div class="form-wrapper">
+    <h2>Вход в учетную запись</h2>
+    <form action="/login" method="post">
+        <div class="form-group">
+            <label>Имя пользователя</label>
+            <input name="username" placeholder="Введите имя пользователя" required type="text">
+        </div>
+        <div class="form-group">
+            <label>Пароль</label>
+            <input id="password" name="password" placeholder="Введите пароль" required type="password">
+            <div id="password-strength"></div>
+        </div>
+        {% if error %}
+        <p>{{ error }}</p>
+        {% endif %}
+        <button type="submit">Войти</button>
+    </form>
+</div>
+</body>
+
+</html>

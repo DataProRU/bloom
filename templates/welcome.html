@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Добро пожаловать{% endblock %}
+
+{% block nav %}
+<h2 class="welcome-title">Добро пожаловать, {{ username }}</h2>
+{% endblock %}
+
+{% block content %}
+
+<section class="section-center">
+    <!--<img src="/templates/img/welcome-bg.jpg" class="img-bg" alt="фоновое изображение">-->
+    <div class="opasity-btn-container">
+        {% if role == 'admin' %}
+        <button class="welcome-bth"><a href="/users/">Доступ</a></button>
+        {% endif %}
+        <button class="welcome-bth"><a href="/tg_users/">Пользователи бота</a></button>
+        <button class="welcome-bth"><a href="/directory/">Справочник</a></button>
+    </div>
+</section>
+{% endblock %}

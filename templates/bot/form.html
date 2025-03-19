@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Форма для операции</title>
+    <style>
+        /* Ваши стили остаются без изменений */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #eaeef3;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            width: 90%;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .form-container:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .header img {
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+            color: #2c3e50;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+            background-color: #fff;
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Нормализация для input[type="date"] */
+        input[type="date"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            padding: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            color: #555;
+            cursor: pointer;
+        }
+
+        input[type="date"]:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+            background-color: #fff;
+            outline: none;
+        }
+
+        /* Улучшение для select */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            color: #555;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='%23555'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px 12px;
+        }
+
+        select:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+            background-color: #fff;
+            outline: none;
+        }
+
+        /* Убираем стандартную стрелку для input[type="number"] */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield; /* Firefox */
+        }
+
+        /* Стили для горизонтального контейнера */
+        .horizontal-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px; /* Расстояние между элементами */
+            align-items: flex-start; /* Выравнивание элементов по верхнему краю */
+            flex-wrap: nowrap; /* Запрет на перенос элементов на новую строку */
+        }
+
+        .horizontal-container > div {
+            flex: 1; /* Равномерное распределение пространства */
+        }
+
+        /* Адаптивные стили для мобильных устройств */
+        @media (max-width: 480px) {
+            .horizontal-container {
+                gap: 10px; /* Уменьшаем расстояние между элементами */
+            }
+
+            .horizontal-container > div {
+                flex: 1 1 45%; /* Элементы занимают 45% ширины, чтобы поместиться в одну строку */
+            }
+        }
+
+        /* Стили для лоадера */
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 40%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Стили для сообщения об успешной загрузке */
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <div class="header">
+        <img alt="Логотип" src="https://raw.githubusercontent.com/PavelErsh/images/refs/heads/main/bg.png">
+        <h1>Финансовый отчёт</h1>
+    </div>
+    <form id="financialForm">
+        <label for="date">Дата:</label>
+        <input id="date" name="date" required type="date">
+        <script>
+            // Автоматически заполняем поле даты текущим значением
+            window.onload = function () {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('date').value = today;
+                document.getElementById('date_finish').value = today;
+            };
+        </script>
+
+        <label for="operation_type">Вид операции:</label>
+        <input name="username" type="hidden" value="{{ username }}">
+        <select id="operation_type" name="operation_type" required>
+            <option disabled selected value="">Выберите вид операции</option>
+            {% for operation in operations %}
+            <option value="{{ operation.name }}">{{ operation.name }}</option>
+            {% endfor %}
+        </select>
+
+        <div class="horizontal-container">
+            <div id="wallet_from" style="display: none;">
+                <label for="wallet_from_select">Кошелёк (откуда):</label>
+                <select id="wallet_from_select" name="wallet_from">
+                    <option disabled selected value="">Выберите кошелёк</option>
+                    {% for wallet in wallets %}
+                    <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="wallet_to" style="display: none;">
+                <label for="wallet_to_select">Кошелёк (куда):</label>
+                <select id="wallet_to_select" name="wallet_to">
+                    <option disabled selected value="">Выберите кошелёк</option>
+                    {% for wallet in wallets %}
+                    <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="horizontal-container">
+            <div>
+                <label for="accounting_type">Категория:</label>
+                <select id="accounting_type" name="accounting_type" required>
+                    <option disabled selected value="">Выберите категорию</option>
+                </select>
+            </div>
+            <div>
+                <label for="account_type">Статья:</label>
+                <select id="account_type" name="account_type" required>
+                    <option disabled selected value="">Выберите статью</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label for="date_finish">Дата назначения:</label>
+            <input id="date_finish" name="date_finish" required type="date">
+        </div>
+
+        <div class="horizontal-container">
+            <div>
+                <label for="amount">Сумма:</label>
+                <input id="amount" name="amount" placeholder="Введите сумму" required type="number">
+            </div>
+            <div>
+                <label for="payment_type">Способ оплаты:</label>
+                <select id="payment_type" name="payment_type" required>
+                    <option disabled selected value="">Выберите тип оплаты</option>
+                    {% for payment_type in payment_types %}
+                    <option value="{{ payment_type.name }}">{{ payment_type.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <label for="comment">Назначение платежа:</label>
+        <textarea id="comment" name="comment" placeholder="Введите комментарий"></textarea>
+
+        <div id="wallet">
+            <label for="wallet_select">Кошелёк:</label>
+            <select id="wallet_select" name="wallet">
+                <option disabled selected value="">Выберите кошелёк</option>
+                {% for wallet in wallets %}
+                <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button id="submitButton" type="submit">Отправить</button>
+    </form>
+    <div class="loader" id="loader"></div>
+    <div class="success-message" id="successMessage">Данные успешно загружены!</div>
+</div>
+
+<script>
+    const categoryArticles = {{ category_articles|tojson }};
+    const operationCategories = {{ operation_categories|tojson }};
+
+    document.getElementById('accounting_type').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        const accountTypeSelect = document.getElementById('account_type');
+        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите статью</option>';
+
+        if (categoryArticles[selectedCategory]) {
+            categoryArticles[selectedCategory].forEach(article => {
+                const option = document.createElement('option');
+                option.value = article;
+                option.textContent = article;
+                accountTypeSelect.appendChild(option);
+            });
+        }
+    });
+
+    document.getElementById('operation_type').addEventListener('change', function() {
+        const selectedOperation = this.value;
+        const categorySelect = document.getElementById('accounting_type');
+        const accountTypeSelect = document.getElementById('account_type');
+        const dateFinishInput = document.getElementById('date_finish');
+        const dateFinishField = dateFinishInput.parentElement;
+        const paymentTypeField = document.getElementById('payment_type').parentElement;
+        const walletFromField = document.getElementById('wallet_from');
+        const walletToField = document.getElementById('wallet_to');
+        const walletField = document.getElementById('wallet');
+
+        categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
+        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите статью</option>';
+
+        if (operationCategories[selectedOperation]) {
+            operationCategories[selectedOperation].forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        if (selectedOperation === 'Перемещение') {
+            // Hide fields not needed for "Перемещение"
+            dateFinishField.style.display = 'none';
+            paymentTypeField.style.display = 'none';
+            categorySelect.parentElement.style.display = 'none';
+            accountTypeSelect.parentElement.style.display = 'none';
+            walletField.style.display = 'none';
+
+            // Show fields specific to "Перемещение"
+            walletFromField.style.display = 'block';
+            walletToField.style.display = 'block';
+
+            // Remove required attribute for hidden fields
+            categorySelect.required = false;
+            accountTypeSelect.required = false;
+            dateFinishInput.removeAttribute('required');
+            paymentTypeField.querySelector('select').required = false;
+
+            // Reset values for hidden fields
+            categorySelect.value = '';
+            accountTypeSelect.value = '';
+            dateFinishInput.setAttribute('required', 'required');
+            paymentTypeField.querySelector('select').value = '';
+        } else {
+            // Show all fields for other operations
+            dateFinishField.style.display = 'block';
+            paymentTypeField.style.display = 'block';
+            categorySelect.parentElement.style.display = 'block';
+            accountTypeSelect.parentElement.style.display = 'block';
+            walletField.style.display = 'block';
+
+            // Hide fields specific to "Перемещение"
+            walletFromField.style.display = 'none';
+            walletToField.style.display = 'none';
+
+            // Set the required attribute for the fields that are mandatory for other operations
+            categorySelect.required = true;
+            accountTypeSelect.required = true;
+            dateFinishInput.required = true;
+            paymentTypeField.querySelector('select').required = true;
+        }
+    });
+
+    document.getElementById('financialForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('successMessage').style.display = 'none';
+        document.getElementById('submitButton').disabled = true;
+
+        const formData = new FormData(this);
+
+        fetch('/submit', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('submitButton').disabled = false;
+
+            // Скрываем сообщение об успешной загрузке через 3 секунды
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+            }, 3000);
+
+            // Очищаем форму после успешной отправки
+            this.reset();
+        })
+        .catch(error => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('submitButton').disabled = false;
+            alert('Произошла ошибка: ' + error.message);
+        });
+    });
+</script>
+</body>
+</html>

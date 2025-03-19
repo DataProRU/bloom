@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>{% block title %}{% endblock %}</title>
+    <link href="/static/style.css" rel="stylesheet">
+</head>
+
+<body>
+<header class="header-container">
+    <section class="header-title">
+
+
+        {% block nav %}
+
+        {% endblock %}
+
+    </section>
+
+    <section class="content-container">
+        {% block content %}
+
+        {% endblock %}
+    </section>
+
+</header>
+
+<script src="/static/scripts/script.js"></script>
+</body>
+
+</html>
