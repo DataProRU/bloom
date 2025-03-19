@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Управление статьями</title>
+    <title>Управление контрагентами</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -168,7 +168,7 @@
     </style>
 </head>
 <body>
-<h1>Управление статьями</h1>
+<h1>Управление контрагентами</h1>
 <div style="text-align: right; margin-bottom: 20px; margin-right: 20px;">
     <a href="/directory">
         <button>Назад</button>
@@ -176,13 +176,13 @@
 </div>
 
 <div style="text-align: center; margin-bottom: 20px;">
-    <button onclick="showModal('add-modal')">Добавление новой статьи</button>
+    <button onclick="showModal('add-modal')">Добавление нового контрагента</button>
 </div>
 
 <table>
     <thead>
     <tr>
-        <th>Название статьи</th>
+        <th>Название контрагента</th>
         <th>Операция</th>
         <th>Категория</th>
         <th>Действия</th>
@@ -199,7 +199,7 @@
                 Изменить
             </button>
             <form action="/articles/{{ article.id }}/delete/" method="post" style="display:inline;">
-                <button class="fixed-width-button" onclick="return confirm('Вы точно хотите удалить эту статью?');"
+                <button class="fixed-width-button" onclick="return confirm('Вы точно хотите удалить этого контрагента?');"
                         type="submit">Удалить
                 </button>
             </form>
@@ -212,9 +212,9 @@
 <div class="modal" id="add-modal">
     <div class="modal-content">
         <button class="close" onclick="closeModal('add-modal')">&times;</button>
-        <h2>Добавление новой статьи</h2>
+        <h2>Добавление нового контрагента</h2>
         <form action="/articles/add/" method="post">
-            <label for="new-article-title">Название статьи:</label>
+            <label for="new-article-title">Название контрагента:</label>
             <input id="new-article-title" name="title" required type="text">
             <label for="new_article_category_operation">Операция:</label>
             <select id="new_article_category_operation" name="category_operation" required>
@@ -238,10 +238,10 @@
 <div class="modal" id="edit-modal">
     <div class="modal-content">
         <button class="close" onclick="closeModal('edit-modal')">&times;</button>
-        <h2>Изменение статьи</h2>
+        <h2>Изменение контрагента</h2>
         <form id="edit-form" method="post">
             <input id="edit-article-id" name="user_id" type="hidden">
-            <label for="edit-article-title">Название статьи:</label>
+            <label for="edit-article-title">Название контрагента:</label>
             <input id="edit-article-title" name="title" required type="text">
             <label for="edit_article_category_operation">Операция:</label>
             <select id="edit_article_category_operation" name="category_operation" required>
