@@ -292,7 +292,7 @@
             <div>
                 <label for="account_type">Контрагенты:</label>
                 <select id="account_type" name="account_type" required>
-                    <option disabled selected value="">Выберите статью</option>
+                    <option disabled selected value="">Выберите контрагента</option>
                 </select>
             </div>
         </div>
@@ -344,7 +344,7 @@
     document.getElementById('accounting_type').addEventListener('change', function() {
         const selectedCategory = this.value;
         const accountTypeSelect = document.getElementById('account_type');
-        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите статью</option>';
+        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите контрагента</option>';
 
         if (categoryArticles[selectedCategory]) {
             categoryArticles[selectedCategory].forEach(article => {
@@ -368,7 +368,7 @@
         const walletField = document.getElementById('wallet');
 
         categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
-        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите статью</option>';
+        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите контрагента</option>';
 
         if (operationCategories[selectedOperation]) {
             operationCategories[selectedOperation].forEach(category => {
