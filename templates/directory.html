@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Добро пожаловать{% endblock %}
+
+{% block nav %}
+<h2 class="welcome-title">Справочник</h2>
+{% endblock %}
+
+{% block content %}
+
+<section class="section-center">
+    <!--<img src="/templates/img/welcome-bg.jpg" class="img-bg" alt="фоновое изображение">-->
+    <div style="position: absolute; top: 10%; right: 10%;">
+        <a href="/" style="text-decoration: none;">
+            <button class="welcome-bth"
+                    style=" background-color:  #357abd; color: white; border: none; padding: 10px 20px; cursor: pointer;">
+                Назад
+            </button>
+        </a>
+    </div>
+    <div class="opasity-btn-container">
+        <button class="welcome-bth"><a href="/operations/">Операции</a></button>
+        <button class="welcome-bth"><a href="/categories/">Категории</a></button>
+        <button class="welcome-bth"><a href="/articles/">Статьи</a></button>
+        <button class="welcome-bth"><a href="/payment_types/">Способы оплаты</a></button>
+        <button class="welcome-bth"><a href="/wallets/">Кошельки</a></button>
+    </div>
+</section>
+{% endblock %}
