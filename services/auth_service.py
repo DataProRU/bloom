@@ -42,7 +42,7 @@ async def login_user(request: Request, form_data, db: databases.Database, templa
                 {"sub": form_data.username, "role": user["role"]}
             )
             response = RedirectResponse(
-                url="/welcome", status_code=status.HTTP_303_SEE_OTHER
+                url="/tg_bot_add?username=" + user.username, status_code=status.HTTP_303_SEE_OTHER
             )
             response.set_cookie(key="token", value=token, httponly=True)
             return response
