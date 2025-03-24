@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from services.auth import verify_password, get_password_hash, create_access_token
 from schemas import UserCreate
 import databases
-
+from urllib.parse import urlparse
 
 async def register_user(
         request: Request,
@@ -29,32 +29,49 @@ async def register_user(
         )
 
 
-async def login_user(request: Request, form_data, db: databases.Database, templates):
-    try:
-        # Получаем URL, с которого пользователь пришел
-        previous_url = request.cookies.get("referer")
+from urllib.parse import urlparse, parse_qs
 
-        # Запрос к базе данных
+async def login_user(
+    request: Request,
+    form_data,
+    db: databases.Database,
+    templates,
+):
+    try:
+        # Check for stored original URL first
+        original_url = request.cookies.get("original_url")
+
+        # If no stored URL, check referer as fallback
+        if not original_url:
+            referer_url = request.headers.get('referer')
+            if referer_url:
+                parsed_url = urlparse(referer_url)
+                original_url = f"{parsed_url.path}?{parsed_url.query}" if parsed_url.query else parsed_url.path
+
+        # Database query
         query = "SELECT * FROM web_users WHERE username = :username"
         user = await db.fetch_one(query=query, values={"username": form_data.username})
 
-        # Проверка логина и пароля
         if user and verify_password(form_data.password, user["password"]):
-            # Генерация токена
             token = create_access_token({"sub": form_data.username, "role": user["role"]})
 
-            # Определяем, куда редиректить
-            if previous_url and previous_url.startswith("/tg_bot_add"):
-                redirect_url = previous_url  # Возвращаем на предыдущую страницу
-            else:
-                redirect_url = "/welcome"  # Если другая страница, то на welcome
+            # Parse the original URL to extract path and query parameters
+            parsed_original_url = urlparse(original_url)
+            original_path = parsed_original_url.path
+            original_query_params = parse_qs(parsed_original_url.query)
 
-            # Создаем редирект и ставим куки
+            # Determine redirect URL
+            if original_path == "/tg_bot_add" and "username" in original_query_params:
+                # Reconstruct the full URL with query parameters
+                redirect_url = f"{original_path}?{'&'.join([f'{k}={v[0]}' for k, v in original_query_params.items()])}"
+            else:
+                redirect_url = "/welcome"
+
             response = RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
             response.set_cookie(key="token", value=token, httponly=True)
+            response.delete_cookie("original_url")  # Clean up the stored URL
             return response
 
-        # Ошибка авторизации
         return templates.TemplateResponse(
             "login.html", {"request": request, "error": "Invalid username or password"}
         )

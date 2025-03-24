@@ -7,7 +7,10 @@ from services.auth import decode_access_token
 def get_token_from_cookie(request: Request):
     token = request.cookies.get("token")
     if not token:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        # Store the current URL in a cookie before redirecting to login
+        response = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        response.set_cookie("original_url", str(request.url), max_age=60)  # Store for 60 seconds
+        return response
     return token
 
 

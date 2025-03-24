@@ -8,6 +8,8 @@ from fastapi import FastAPI, Form, Request, APIRouter, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pytz import timezone
+from dependencies import get_token_from_cookie
+from fastapi.responses import RedirectResponse
 
 app = FastAPI()
 router = APIRouter()
@@ -21,7 +23,7 @@ logger = logging.getLogger(__name__)
 try:
     gc = gspread.service_account(filename="credentials.json")
     sht2 = gc.open_by_url(
-        'https://docs.google.com/spreadsheets/d/1NZaFb5ssWHbVcWH-3OUgLN32KcoxI86GW7qyNttZbsI/edit?gid=0#gid=0'
+        'https://docs.google.com/spreadsheets/d/1dvW23dQyYB0D6afUYAj1L6mp-xl7DJ5W1GFLIHOxxp0/edit?gid=497331245#gid=497331245'
     )
     worksheet = sht2.get_worksheet(0)
 except Exception as e:
@@ -33,9 +35,19 @@ def format_date(date):
     date_obj = datetime.strptime(date, "%Y-%m-%d").date()
     return date_obj.strftime("%d.%m.%Y")
 
+from fastapi import Query
 
 @router.get("/tg_bot_add", response_class=HTMLResponse)
-async def get_form(request: Request, username: str, db: Database = Depends(get_db)):
+async def get_form(
+    request: Request,
+    username: str = Query(...),  # Обязательный параметр
+    db: Database = Depends(get_db),
+):
+    token = get_token_from_cookie(request)
+    print(token)
+    if isinstance(token, RedirectResponse):
+        return token
+
     users_data = await db.fetch_all(TgUser.__table__.select())
     payment_types = await db.fetch_all(PaymentTypes.__table__.select())
     operations = await db.fetch_all(Operations.__table__.select())
@@ -60,12 +72,17 @@ async def get_form(request: Request, username: str, db: Database = Depends(get_d
 
     return templates.TemplateResponse(
         "bot/form.html",
-        {"request": request, "users": users_data, "username": username,
-         "payment_types": payment_types, "operations": operations,
-         "operation_categories": operation_categories,
-         "category_articles": category_articles, "wallets": wallets}
+        {
+            "request": request,
+            "users": users_data,
+            "username": username,
+            "payment_types": payment_types,
+            "operations": operations,
+            "operation_categories": operation_categories,
+            "category_articles": category_articles,
+            "wallets": wallets,
+        },
     )
-
 
 @router.post("/submit", response_class=HTMLResponse)
 async def submit_form(
