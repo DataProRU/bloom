@@ -31,19 +31,26 @@ async def register_user(
 
 async def login_user(request: Request, form_data, db: databases.Database, templates):
     try:
-        # Выполнение запроса к базе данных
+        # Получаем URL, с которого пользователь пришел
+        previous_url = request.cookies.get("referer")
+
+        # Запрос к базе данных
         query = "SELECT * FROM web_users WHERE username = :username"
         user = await db.fetch_one(query=query, values={"username": form_data.username})
 
-        # Проверка, найден ли пользователь и совпадает ли пароль
+        # Проверка логина и пароля
         if user and verify_password(form_data.password, user["password"]):
-            # Генерация токена и установка куки
-            token = create_access_token(
-                {"sub": form_data.username, "role": user["role"]}
-            )
-            response = RedirectResponse(
-                url="/welcome", status_code=status.HTTP_303_SEE_OTHER
-            )
+            # Генерация токена
+            token = create_access_token({"sub": form_data.username, "role": user["role"]})
+
+            # Определяем, куда редиректить
+            if previous_url and previous_url.startswith("/tg_bot_add"):
+                redirect_url = previous_url  # Возвращаем на предыдущую страницу
+            else:
+                redirect_url = "/welcome"  # Если другая страница, то на welcome
+
+            # Создаем редирект и ставим куки
+            response = RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
             response.set_cookie(key="token", value=token, httponly=True)
             return response
 
@@ -53,7 +60,6 @@ async def login_user(request: Request, form_data, db: databases.Database, templa
         )
 
     except Exception as e:
-        # Логирование ошибки для отладки (по желанию)
         print(f"Error logging in: {e}")
         return templates.TemplateResponse(
             "login.html", {"request": request, "error": "An error occurred"}

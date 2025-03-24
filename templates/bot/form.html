@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="apple-touch-icon" sizes="192x192" href="/static/img/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
     <title>Форма для операции</title>
     <style>
         /* Ваши стили остаются без изменений */
@@ -232,7 +237,7 @@
 <body>
 <div class="form-container">
     <div class="header">
-        <img alt="Логотип" src="https://raw.githubusercontent.com/PavelErsh/images/refs/heads/main/bg.png">
+        <img alt="Логотип" src="/static/img/лого.png">
         <h1>Финансовый отчёт</h1>
     </div>
     <form id="financialForm">
@@ -286,9 +291,9 @@
                 </select>
             </div>
             <div>
-                <label for="account_type">Статья:</label>
+                <label for="account_type">Контрагенты:</label>
                 <select id="account_type" name="account_type" required>
-                    <option disabled selected value="">Выберите статью</option>
+                    <option disabled selected value="">Выберите контрагента</option>
                 </select>
             </div>
         </div>
@@ -340,7 +345,7 @@
     document.getElementById('accounting_type').addEventListener('change', function() {
         const selectedCategory = this.value;
         const accountTypeSelect = document.getElementById('account_type');
-        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите статью</option>';
+        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите контрагента</option>';
 
         if (categoryArticles[selectedCategory]) {
             categoryArticles[selectedCategory].forEach(article => {
@@ -364,7 +369,7 @@
         const walletField = document.getElementById('wallet');
 
         categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
-        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите статью</option>';
+        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите контрагента</option>';
 
         if (operationCategories[selectedOperation]) {
             operationCategories[selectedOperation].forEach(category => {
