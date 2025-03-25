@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 try:
     gc = gspread.service_account(filename="credentials.json")
     sht2 = gc.open_by_url(
-        'https://docs.google.com/spreadsheets/d/1dvW23dQyYB0D6afUYAj1L6mp-xl7DJ5W1GFLIHOxxp0/edit?gid=497331245#gid=497331245'
+        'https://docs.google.com/spreadsheets/d/1dvW23dQyYB0D6afUYAj1L6mp-xl7DJ5W1GFLIHOxxp0/edit?gid=429053782#gid=429053782'
     )
     worksheet = sht2.get_worksheet(0)
 except Exception as e:
@@ -84,6 +84,7 @@ async def get_form(
         },
     )
 
+
 @router.post("/submit", response_class=HTMLResponse)
 async def submit_form(
         request: Request,
@@ -104,48 +105,24 @@ async def submit_form(
         current_time = datetime.now(moscow_tz).strftime("%d.%m.%Y %H:%M:%S")
         username = username.replace("%20", " ")
 
-        # Применяем форматирование столбца с датами до добавления данных
-        worksheet.format('C:C', {
-            "numberFormat": {
-                "type": "DATE",
-                "pattern": "dd.mm.yyyy"
-            }
-        })
-        worksheet.format('G:G', {
-            "numberFormat": {
-                "type": "DATE",
-                "pattern": "dd.mm.yyyy"
-            }
-        })
-        worksheet.format('A:A', {
-            "numberFormat": {
-                "type": "DATE",
-                "pattern": "dd.mm.yyyy HH:mm:ss"
-            }
-        })
-
-        # Преобразуем строку даты в объект datetime
+        # Сначала добавляем данные, потом форматируем только добавленные строки
         formatted_operation_date = format_date(date)
 
         if operation_type == "Перемещение":
-            # Для "Перемещения" дата окончания не требуется
             formatted_finish_date = ""
         else:
-            formatted_finish_date = format_date(date_finish)
+            formatted_finish_date = format_date(date_finish) if date_finish else ""
             if operation_type == "Расход":
-                # Для "Расхода" меняем знак суммы на отрицательный
                 amount = -amount
 
         new_row = [
             current_time,
             username,
             formatted_operation_date,
-            # Передаем дату операции в формате, который Google Таблицы могут распознать как дату
             operation_type,
             accounting_type,
             account_type,
             formatted_finish_date,
-            # Передаем дату назначения в формате, который Google Таблицы могут распознать как дату
             amount,
             payment_type,
             comment,
@@ -162,6 +139,38 @@ async def submit_form(
             new_row.append(wallet)
             worksheet.append_row(new_row, value_input_option="USER_ENTERED")
 
+        # Получаем текущий размер таблицы
+        num_rows = len(worksheet.get_all_values())
+        num_cols = len(worksheet.get_all_values()[0]) if num_rows > 0 else 0
+
+        # Форматируем только если столбцы существуют
+        if num_cols >= 1:  # Столбец A
+            worksheet.format(f'A1:A{num_rows}', {
+                "numberFormat": {
+                    "type": "DATE",
+                    "pattern": "dd.mm.yyyy HH:mm:ss"
+                }
+            })
+
+        if num_cols >= 3:  # Столбец C
+            worksheet.format(f'C1:C{num_rows}', {
+                "numberFormat": {
+                    "type": "DATE",
+                    "pattern": "dd.mm.yyyy"
+                }
+            })
+
+        if num_cols >= 7:  # Столбец G
+            worksheet.format(f'G1:G{num_rows}', {
+                "numberFormat": {
+                    "type": "DATE",
+                    "pattern": "dd.mm.yyyy"
+                }
+            })
+
+        # Вывод в консоль для отладки
+        print(f"\nДобавлена новая запись. Текущий размер таблицы: {num_rows} строк, {num_cols} столбцов")
+
         return templates.TemplateResponse(
             "bot/success.html", {"request": request, "message": "Данные успешно добавлены!"}
         )
@@ -171,6 +180,5 @@ async def submit_form(
         return templates.TemplateResponse(
             "bot/error.html", {"request": request, "message": f"Произошла ошибка: {str(e)}"}
         )
-
 
 app.include_router(router)
