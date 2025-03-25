@@ -3,14 +3,41 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Вход</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="/static/style.css" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="apple-touch-icon" sizes="192x192" href="/static/img/android-chrome-192x192.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="/dynamic-manifest.json" id="app-manifest">
+    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Проверяем PWA-режим
+            const isPWA = window.navigator.standalone || 
+                         window.matchMedia('(display-mode: standalone)').matches;
+            
+            // Если в PWA-режиме, обновляем манифест
+            if (isPWA) {
+                const manifest = document.getElementById('app-manifest');
+                manifest.href = `/dynamic-manifest.json?ts=${Date.now()}`;
+                
+                // Проверяем соответствие текущего URL
+                fetch('/api/check-pwa-url')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.redirect_url !== window.location.pathname) {
+                            window.location.href = data.redirect_url;
+                        }
+                    });
+            }
+        });
+        </script>
+    
     <style>
         body {
             display: flex;
@@ -113,22 +140,7 @@
             text-align: center;
         }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Получаем original_url из переменной шаблона
-            const originalUrl = "{{ original_url | safe }}";
-            
-            if (originalUrl && !originalUrl.includes("/login")) {
-                // Сохраняем в localStorage для PWA
-                localStorage.setItem("pwa_start_url", originalUrl);
-                
-                // Если это iOS в standalone-режиме (уже добавлен на экран) - делаем редирект
-                if (window.navigator.standalone) {
-                    window.location.href = originalUrl;
-                }
-            }
-        });
-    </script>
+    
 </head>
 
 <body>

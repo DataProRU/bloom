@@ -1,11 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from database import init_db, database
 from routes import users, auth_routes, bot_add, tg_users, main_directory
 from routes.directory import payment_types, operations, categories, articles, wallets
-
+import json
 app = FastAPI()
 
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
@@ -43,3 +43,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/dynamic-manifest.json")
+async def get_dynamic_manifest(request: Request):
+    # Получаем original_url из cookies
+    original_url = request.cookies.get("original_url", "/default_path")
+    
+    manifest_data = {
+        "name": "My App",
+        "short_name": "App",
+        "start_url": original_url,  # Динамический URL
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#00aaff",
+        "icons": [
+            {
+                "src": "/static/img/android-chrome-192x192.png",
+                "sizes": "192x192",
+                "type": "image/png"
+            }
+        ]
+    }
+    
+    return Response(
+        content=json.dumps(manifest_data),
+        media_type="application/json",
+        headers={"Cache-Control": "no-cache"}
+    )
