@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Вход</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link href="/static/style.css" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
@@ -111,7 +113,22 @@
             text-align: center;
         }
     </style>
-
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Получаем original_url из переменной шаблона
+            const originalUrl = "{{ original_url | safe }}";
+            
+            if (originalUrl && !originalUrl.includes("/login")) {
+                // Сохраняем в localStorage для PWA
+                localStorage.setItem("pwa_start_url", originalUrl);
+                
+                // Если это iOS в standalone-режиме (уже добавлен на экран) - делаем редирект
+                if (window.navigator.standalone) {
+                    window.location.href = originalUrl;
+                }
+            }
+        });
+    </script>
 </head>
 
 <body>
