@@ -424,6 +424,8 @@
     });
 
     document.getElementById('financialForm').addEventListener('submit', function(event) {
+        const dateValue = document.getElementById('date').value;
+        const dateFinishValue = document.getElementById('date_finish').value;
         event.preventDefault();
         document.getElementById('loader').style.display = 'block';
         document.getElementById('successMessage').style.display = 'none';
@@ -448,6 +450,8 @@
 
             // Очищаем форму после успешной отправки
             this.reset();
+            document.getElementById('date').value = dateValue;
+            document.getElementById('date_finish').value = dateFinishValue;
         })
         .catch(error => {
             document.getElementById('loader').style.display = 'none';
