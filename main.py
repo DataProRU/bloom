@@ -46,11 +46,10 @@ app.add_middleware(
 
 @app.get("/dynamic-manifest.json")
 async def get_dynamic_manifest(request: Request):
-    # Получаем original_url из cookies
     original_url = request.cookies.get("original_url", "/default_path")
     
     manifest_data = {
-        "name": "My App",
+        "name": "Финансовый учет",
         "short_name": "App",
         "start_url": original_url,  # Динамический URL
         "display": "standalone",

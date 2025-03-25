@@ -17,16 +17,13 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Проверяем PWA-режим
             const isPWA = window.navigator.standalone || 
                          window.matchMedia('(display-mode: standalone)').matches;
             
-            // Если в PWA-режиме, обновляем манифест
             if (isPWA) {
                 const manifest = document.getElementById('app-manifest');
                 manifest.href = `/dynamic-manifest.json?ts=${Date.now()}`;
                 
-                // Проверяем соответствие текущего URL
                 fetch('/api/check-pwa-url')
                     .then(res => res.json())
                     .then(data => {
