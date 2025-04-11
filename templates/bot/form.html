@@ -267,7 +267,7 @@
                 <select id="wallet_from_select" name="wallet_from">
                     <option disabled selected value="">Выберите кошелёк</option>
                     {% for wallet in wallets %}
-                    <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }})</option>
+                    <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -277,7 +277,7 @@
                 <select id="wallet_to_select" name="wallet_to">
                     <option disabled selected value="">Выберите кошелёк</option>
                     {% for wallet in wallets %}
-                    <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }})</option>
+                    <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -327,7 +327,7 @@
             <select id="wallet_select" name="wallet">
                 <option disabled selected value="">Выберите кошелёк</option>
                 {% for wallet in wallets %}
-                <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }})</option>
+                <option value="{{ wallet.name }}">{{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -431,6 +431,35 @@
         document.getElementById('successMessage').style.display = 'none';
         document.getElementById('submitButton').disabled = true;
 
+        const operationType = document.getElementById('operation_type').value;
+        const amount = parseFloat(document.getElementById('amount').value);
+
+        if (operationType === "Расход") {
+            const walletSelect = document.getElementById('wallet_select');
+            const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+            const parts = selectedLabel.split(' ');
+            const money = parseFloat(parts[parts.length - 1]);
+
+            if (money - amount < 0) {
+                alert('Ошибка: Сумма указана ниже баланса кошелька');
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('submitButton').disabled = false;
+                return;
+            }
+        } else if (operationType === "Перемещение") {
+            const walletSelect = document.getElementById('wallet_from_select');
+            const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+            const parts = selectedLabel.split(' ');
+            const money = parseFloat(parts[parts.length - 1]);
+
+            if (money - amount < 0) {
+                alert('Ошибка: Сумма указана ниже баланса кошелька, откуда переводятся средства');
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('submitButton').disabled = false;
+                return;
+            }
+        }
+
         const formData = new FormData(this);
 
         fetch('/submit', {
@@ -442,16 +471,63 @@
             document.getElementById('loader').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
             document.getElementById('submitButton').disabled = false;
+            
 
             // Скрываем сообщение об успешной загрузке через 3 секунды
             setTimeout(() => {
                 document.getElementById('successMessage').style.display = 'none';
             }, 3000);
 
+            if (operationType === "Расход") {
+                const walletSelect = document.getElementById('wallet_select');
+                const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+                const parts = selectedLabel.split(' ');
+                const currentBalance = parseFloat(parts[parts.length - 1]);
+                const newBalance = currentBalance - amount;
+
+                walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+            } else if (operationType === "Приход") {
+                const walletSelect = document.getElementById('wallet_select');
+                const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+                const parts = selectedLabel.split(' ');
+                const currentBalance = parseFloat(parts[parts.length - 1]);
+                const newBalance = currentBalance + amount;
+
+                walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+            } else if (operationType === "Перемещение") {
+                const walletFromSelect = document.getElementById('wallet_from_select');
+                const walletToSelect = document.getElementById('wallet_to_select');
+
+                function updateBalanceInSelect(selectElement, value, amountChange) {
+                    const options = selectElement.options;
+                    for (let i = 0; i < options.length; i++) {
+                        if (options[i].value === value) {
+                            const text = options[i].text;
+                            const newText = text.replace(/(-?\d+\.\d{2})$/, (match) => {
+                                const newBalance = (parseFloat(match) + amountChange).toFixed(2);
+                                return newBalance;
+                            });
+                            options[i].text = newText;
+                            break;
+                        }
+                    }
+                }
+
+                const fromValue = walletFromSelect.value;
+                const toValue = walletToSelect.value;
+
+                updateBalanceInSelect(walletFromSelect, fromValue, -amount);
+                updateBalanceInSelect(walletToSelect, toValue, amount);
+
+                updateBalanceInSelect(walletToSelect, fromValue, -amount);
+                updateBalanceInSelect(walletFromSelect, toValue, amount);
+            }
+
             // Очищаем форму после успешной отправки
             this.reset();
             document.getElementById('date').value = dateValue;
             document.getElementById('date_finish').value = dateFinishValue;
+
         })
         .catch(error => {
             document.getElementById('loader').style.display = 'none';

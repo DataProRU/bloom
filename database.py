@@ -3,10 +3,9 @@ from enum import unique
 from databases import Database
 from fastapi import APIRouter
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import Column, Integer, String, ForeignKey, MetaData, create_engine, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, MetaData, create_engine, Boolean, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -44,6 +43,7 @@ class Wallets(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, unique=True, nullable=False)
     username = Column(Integer, ForeignKey("web_users.username"))
+    balance = Column(Numeric(10, 2), default=0)
 
     web_user = relationship("WebUser", back_populates="wallets")
 
