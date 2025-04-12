@@ -292,7 +292,7 @@
             </div>
             <div>
                 <label for="account_type">Контрагенты:</label>
-                <select id="account_type" name="account_type" required>
+                <select id="account_type" name="account_type">
                     <option disabled selected value="">Выберите контрагента</option>
                 </select>
             </div>
@@ -358,70 +358,81 @@
     });
 
     document.getElementById('operation_type').addEventListener('change', function() {
-        const selectedOperation = this.value;
-        const categorySelect = document.getElementById('accounting_type');
-        const accountTypeSelect = document.getElementById('account_type');
-        const dateFinishInput = document.getElementById('date_finish');
-        const dateFinishField = dateFinishInput.parentElement;
-        const paymentTypeField = document.getElementById('payment_type').parentElement;
-        const walletFromField = document.getElementById('wallet_from');
-        const walletToField = document.getElementById('wallet_to');
-        const walletField = document.getElementById('wallet');
+    const selectedOperation = this.value;
+    const categorySelect = document.getElementById('accounting_type');
+    const accountTypeSelect = document.getElementById('account_type');
+    const dateFinishInput = document.getElementById('date_finish');
+    const dateFinishField = dateFinishInput.parentElement;
+    const paymentTypeField = document.getElementById('payment_type').parentElement;
+    const walletFromField = document.getElementById('wallet_from');
+    const walletToField = document.getElementById('wallet_to');
+    const walletField = document.getElementById('wallet');
+    const walletFromSelect = document.getElementById('wallet_from_select');
+    const walletToSelect = document.getElementById('wallet_to_select');
+    const walletSelect = document.getElementById('wallet_select');
 
-        categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
-        accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите контрагента</option>';
+    // Очищаем и заполняем категории в зависимости от выбранной операции
+    categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
+    accountTypeSelect.innerHTML = '<option value="" disabled selected>Выберите контрагента</option>';
 
-        if (operationCategories[selectedOperation]) {
-            operationCategories[selectedOperation].forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categorySelect.appendChild(option);
-            });
-        }
+    if (operationCategories[selectedOperation]) {
+        operationCategories[selectedOperation].forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+    }
 
-        if (selectedOperation === 'Перемещение') {
-            // Hide fields not needed for "Перемещение"
-            dateFinishField.style.display = 'none';
-            paymentTypeField.style.display = 'none';
-            categorySelect.parentElement.style.display = 'none';
-            accountTypeSelect.parentElement.style.display = 'none';
-            walletField.style.display = 'none';
+    if (selectedOperation === 'Перемещение') {
+        // Скрываем поля, не нужные для "Перемещения"
+        dateFinishField.style.display = 'none';
+        paymentTypeField.style.display = 'none';
+        categorySelect.parentElement.style.display = 'none';
+        accountTypeSelect.parentElement.style.display = 'none';
+        walletField.style.display = 'none';
 
-            // Show fields specific to "Перемещение"
-            walletFromField.style.display = 'block';
-            walletToField.style.display = 'block';
+        // Показываем поля для "Перемещения"
+        walletFromField.style.display = 'block';
+        walletToField.style.display = 'block';
 
-            // Remove required attribute for hidden fields
-            categorySelect.required = false;
-            accountTypeSelect.required = false;
-            dateFinishInput.removeAttribute('required');
-            paymentTypeField.querySelector('select').required = false;
+        // Управление атрибутами required
+        categorySelect.required = false;
+        dateFinishInput.required = false;
+        document.getElementById('payment_type').required = false;
+        walletSelect.required = false;
+        walletFromSelect.required = true;
+        walletToSelect.required = true;
 
-            // Reset values for hidden fields
-            categorySelect.value = '';
-            accountTypeSelect.value = '';
-            dateFinishInput.setAttribute('required', 'required');
-            paymentTypeField.querySelector('select').value = '';
-        } else {
-            // Show all fields for other operations
-            dateFinishField.style.display = 'block';
-            paymentTypeField.style.display = 'block';
-            categorySelect.parentElement.style.display = 'block';
-            accountTypeSelect.parentElement.style.display = 'block';
-            walletField.style.display = 'block';
+        // Сбрасываем значения скрытых полей
+        categorySelect.value = '';
+        accountTypeSelect.value = '';
+        document.getElementById('payment_type').value = '';
+    } else {
+        // Показываем все основные поля
+        dateFinishField.style.display = 'block';
+        paymentTypeField.style.display = 'block';
+        categorySelect.parentElement.style.display = 'block';
+        accountTypeSelect.parentElement.style.display = 'block';
+        walletField.style.display = 'block';
 
-            // Hide fields specific to "Перемещение"
-            walletFromField.style.display = 'none';
-            walletToField.style.display = 'none';
+        // Скрываем поля для "Перемещения"
+        walletFromField.style.display = 'none';
+        walletToField.style.display = 'none';
 
-            // Set the required attribute for the fields that are mandatory for other operations
-            categorySelect.required = true;
-            accountTypeSelect.required = true;
-            dateFinishInput.required = true;
-            paymentTypeField.querySelector('select').required = true;
-        }
-    });
+        // Управление атрибутами required
+        categorySelect.required = true;
+        dateFinishInput.required = true;
+        document.getElementById('payment_type').required = true;
+        walletSelect.required = true;
+        walletFromSelect.required = false;
+        walletToSelect.required = false;
+
+        // Сбрасываем значения полей для "Перемещения"
+        walletFromSelect.value = '';
+        walletToSelect.value = '';
+    }
+});
 
     document.getElementById('financialForm').addEventListener('submit', function(event) {
         const dateValue = document.getElementById('date').value;

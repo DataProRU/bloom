@@ -148,6 +148,17 @@
             height: 70%;
             width: 100px; /* Adjust the width as needed */
         }
+        .copy-link-btn {
+        padding: 4px 8px;
+        background: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .copy-link-btn:hover {
+        background: #e0e0e0;
+    }
     </style>
 </head>
 <body>
@@ -169,6 +180,7 @@
     <tr>
         <th>Имя</th>
         <th>Роль</th>
+        <th>Ссылка на пользователя</th>
         <th>Действия</th>
     </tr>
     </thead>
@@ -177,6 +189,16 @@
     <tr>
         <td>{{ user.username }}</td>
         <td>{{ user.role }}</td>
+        <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <!--<a href="https://bloom-finance.ru/tg_bot_add?username={{ user.username | urlencode }}" target="_blank" style="margin-right: 8px;">
+                    Открыть ссылку
+                </a>-->
+                <button class="action-buttons" onclick="copyToClipboard('https://bloom-finance.ru/tg_bot_add?username={{ user.username | urlencode }}')">
+                    Копировать
+                </button>
+            </div>
+        </td>
         <td class="action-buttons">
             <!-- Edit button -->
             <button class="fixed-width-button"
@@ -236,6 +258,23 @@
 </div>
 
 <script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                alert('Ссылка скопирована: ');
+            })
+            .catch(err => {
+                console.error('Ошибка копирования: ', err);
+                // Fallback для старых браузеров
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Ссылка скопирована!');
+            });
+    }
     // Show the modal
     function showModal(modalId) {
         document.getElementById(modalId).classList.add('active');
@@ -268,3 +307,4 @@
 </script>
 </body>
 </html>
+
