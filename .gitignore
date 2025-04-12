@@ -7,3 +7,6 @@ venv_name
 __pycache__/
 idea/
 backup.sql
+midyear-cursor-379909-cc15f63beea0.json
+eq_rental.db
+nohup.out
