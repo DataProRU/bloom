@@ -70,6 +70,13 @@
         margin-right: 15px;
       }
 
+      #detailBtn {
+        width: 71px;
+        word-wrap: break-word;
+        font-size: 13px;
+        margin-left: 15px;
+      }
+
       .header h1 {
         margin: 0;
         font-size: 26px;
@@ -261,6 +268,56 @@
         width: 80%;
         box-sizing: border-box;
       }
+      .detailing {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .detailing-content {
+        height: 780px;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        max-width: 500px;
+        width: 90%;
+        box-sizing: border-box;
+        position: relative;
+      }
+      .detailing-body {
+        height: calc(100% - 152px);
+        overflow: auto;
+      }
+
+      .modal-button {
+        color: #000;
+        background-color: #f8f9fa;
+        border-color: #f8f9fa;
+        text-align: start;
+        margin: 10px 0;
+        word-wrap: break-word;
+      }
+
+      .modal-button:hover {
+        color: #000;
+        background-color: #e2e6ea;
+        border-color: #dae0e5;
+      }
+
+      .modal-button span:not(:last-child) {
+        margin-right: 20px
+      }
+
+      .detailing-footer {
+        margin-top: 20px;
+      }
     </style>
   </head>
   <body>
@@ -268,6 +325,7 @@
       <div class="header">
         <img alt="Логотип" src="/static/img/лого.png" />
         <h1>Финансовый отчёт</h1>
+        <button id="detailBtn" type="submit">Детализация</button>
       </div>
       <form id="financialForm">
         <label for="date">Дата:</label>
@@ -387,9 +445,82 @@
       </div>
     </div>
 
+    <div class="detailing" id="detailModal">
+      <div class="detailing-content">
+        <div class="header">
+          <img alt="Логотип" src="/static/img/лого.png" />
+          <h1>Детализация</h1>
+        </div>
+        <div class="detailing-body" id="detailingBody">
+          <!-- Financial operations will be dynamically inserted here -->
+        </div>
+        <div class="detailing-footer">
+          <button id="closeModalBtn" type="submit">Назад</button>
+        </div>
+      </div>
+    </div>
+
+
     <script>
       const categoryArticles = {{ category_articles|tojson }};
       const operationCategories = {{ operation_categories|tojson }};
+      const financialOperations = {{ financial_operations|tojson }};
+
+      const detailBtn = document.getElementById('detailBtn');
+      const detailModal = document.getElementById('detailModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+
+      detailBtn.addEventListener('click', () => {
+      console.log(financialOperations , 'financialOperations')
+        renderFinancialOperations();
+        detailModal.style.display = 'flex';
+      });
+
+      closeModalBtn.addEventListener('click', () => {
+        detailModal.style.display = 'none';
+      });
+
+      function renderFinancialOperations() {
+        const detailingBody = document.getElementById('detailingBody');
+        detailingBody.innerHTML = ''; // Clear any existing content
+
+        financialOperations.forEach((operation, index) => {
+          const button = document.createElement('button');
+          button.className = 'modal-button';
+
+          const numberSpan = document.createElement('span');
+          numberSpan.className = 'number';
+          numberSpan.textContent = `${index + 1}. `
+
+          const dateSpan = document.createElement('span');
+          dateSpan.className = 'date';
+          dateSpan.textContent = operation.operation_date || 'N/A';
+
+          const operationSpan = document.createElement('span');
+          operationSpan.className = 'operation';
+          operationSpan.textContent = operation.operation_type || 'N/A';
+
+          const categorySpan = document.createElement('span');
+          categorySpan.className = 'category';
+          categorySpan.textContent = operation.accounting_type || 'N/A';
+
+          const amountSpan = document.createElement('span');
+          amountSpan.className = 'amount';
+          amountSpan.textContent = operation.amount
+            ? parseFloat(operation.amount) % 1 === 0
+              ? parseInt(operation.amount).toString()
+              : operation.amount.toString()
+            : 'N/A'
+
+          button.appendChild(numberSpan);
+          button.appendChild(dateSpan);
+          button.appendChild(operationSpan);
+          button.appendChild(categorySpan);
+          button.appendChild(amountSpan);
+
+          detailingBody.appendChild(button);
+        });
+      }
 
       document.getElementById('accounting_type').addEventListener('change', function() {
           const selectedCategory = this.value;
