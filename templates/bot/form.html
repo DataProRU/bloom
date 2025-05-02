@@ -499,6 +499,7 @@
         <form id="editForm">
           <div>
             <input type="hidden" id="editIndex" />
+            <input type="hidden" id="editOperationId" name="operation_id" />
 
             <label for="edit_date">Дата:</label>
             <input id="edit_date" name="date" required type="date" />
@@ -692,6 +693,7 @@
         originalOperationData = { ...operation };
 
         document.getElementById('editIndex').value = index;
+        document.getElementById('editOperationId').value = operation.id || '';
 
         const today = new Date().toISOString().split("T")[0];
         document.getElementById('edit_date').value = operation.operation_date
@@ -753,18 +755,124 @@
         };
       }
 
-      editForm.addEventListener('submit', (event) => {
+      editForm.addEventListener('submit', function(event) {
         event.preventDefault();
+
         const index = parseInt(document.getElementById('editIndex').value);
-        const updatedData = getFormData();
+        const operationType = document.getElementById('edit_operation_type').value;
+        const amount = parseFloat(document.getElementById('edit_amount').value);
 
-        financialOperations[index] = {
-          ...financialOperations[index],
-          ...updatedData
-        };
+        // Проверка баланса для операции "Расход"
+        if (operationType === "Расход") {
+          const walletSelect = document.getElementById('edit_wallet_select');
+          const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+          const parts = selectedLabel.split(' ');
+          const money = parseFloat(parts[parts.length - 1]);
 
-        renderFinancialOperations();
-        editModal.style.display = 'none';
+          if (money - amount < 0) {
+            alert('Ошибка: Сумма указана ниже баланса кошелька');
+            return;
+          }
+        } else if (operationType === "Перемещение") {
+          // Проверка баланса для операции "Перемещение"
+          const walletSelect = document.getElementById('edit_wallet_from_select');
+          const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+          const parts = selectedLabel.split(' ');
+          const money = parseFloat(parts[parts.length - 1]);
+
+          if (money - amount < 0) {
+            alert('Ошибка: Сумма указана ниже баланса кошелька, откуда переводятся средства');
+            return;
+          }
+        }
+
+        // Показать лоадер и отключить кнопку "Сохранить"
+        document.getElementById('editLoader').style.display = 'block';
+        document.getElementById('editSuccessMessage').style.display = 'none';
+        document.getElementById('saveEditBtn').disabled = true;
+
+        const formData = new FormData(this);
+
+        const editOperationId = document.getElementById('editOperationId').value;
+        console.log(editOperationId, 'editOperationId')
+        fetch('/edit/' + editOperationId, {
+          method: 'PATCH',
+          body: formData
+        })
+        .then(response => response.text())
+        .then(html => {
+          // Скрыть лоадер и показать сообщение об успехе
+          document.getElementById('editLoader').style.display = 'none';
+          document.getElementById('editSuccessMessage').style.display = 'block';
+          document.getElementById('saveEditBtn').disabled = false;
+
+          // Обновить локальные данные
+          const updatedData = getFormData();
+          financialOperations[index] = {
+            ...financialOperations[index],
+            ...updatedData
+          };
+
+          // Обновить баланс кошельков (аналогично financialForm)
+          if (operationType === "Расход") {
+            const walletSelect = document.getElementById('edit_wallet_select');
+            const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+            const parts = selectedLabel.split(' ');
+            const currentBalance = parseFloat(parts[parts.length - 1]);
+            const newBalance = currentBalance - amount;
+
+            walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+          } else if (operationType === "Приход") {
+            const walletSelect = document.getElementById('edit_wallet_select');
+            const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+            const parts = selectedLabel.split(' ');
+            const currentBalance = parseFloat(parts[parts.length - 1]);
+            const newBalance = currentBalance + amount;
+
+            walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+          } else if (operationType === "Перемещение") {
+            const walletFromSelect = document.getElementById('edit_wallet_from_select');
+            const walletToSelect = document.getElementById('edit_wallet_to_select');
+
+            function updateBalanceInSelect(selectElement, value, amountChange) {
+              const options = selectElement.options;
+              for (let i = 0; i < options.length; i++) {
+                if (options[i].value === value) {
+                  const text = options[i].text;
+                  const newText = text.replace(/(-?\d+\.\d{2})$/, (match) => {
+                    const newBalance = (parseFloat(match) + amountChange).toFixed(2);
+                    return newBalance;
+                  });
+                  options[i].text = newText;
+                  break;
+                }
+              }
+            }
+
+            const fromValue = walletFromSelect.value;
+            const toValue = walletToSelect.value;
+
+            updateBalanceInSelect(walletFromSelect, fromValue, -amount);
+            updateBalanceInSelect(walletToSelect, toValue, amount);
+
+            updateBalanceInSelect(walletToSelect, fromValue, -amount);
+            updateBalanceInSelect(walletFromSelect, toValue, amount);
+          }
+
+          // Обновить отображение операций
+          renderFinancialOperations();
+
+          // Скрыть сообщение об успехе через 3 секунды и закрыть модальное окно
+          setTimeout(() => {
+            document.getElementById('editSuccessMessage').style.display = 'none';
+            editModal.style.display = 'none';
+          }, 3000);
+        })
+        .catch(error => {
+          document.getElementById('editLoader').style.display = 'none';
+          document.getElementById('saveEditBtn').disabled = false;
+          alert('Произошла ошибка: ' + error.message);
+        });
       });
 
       document.getElementById('edit_accounting_type').addEventListener('change', function() {
