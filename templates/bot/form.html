@@ -325,6 +325,8 @@
       }
 
       .detailing-footer {
+        display: flex;
+        gap: 34px;
         margin-top: 20px;
       }
 
@@ -361,6 +363,50 @@
       #edit_comment {
           min-height: 100px;
       }
+
+      .close-btn {
+        position: absolute;
+        top: 9px;
+        right: 15px;
+        font-size: 32px;
+        color: #555;
+        cursor: pointer;
+        transition: color 0.3s ease, transform 0.2s ease;
+      }
+
+      .close-btn:hover {
+        color: #007bff;
+        transform: scale(1.2);
+      }
+
+      .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        width: 62px;
+        height: 52px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+
+      .delete-btn:hover {
+        background-color: #c82333;
+      }
+
+      .delete-btn:active {
+        transform: scale(0.98);
+      }
+
+      .delete-btn svg {
+        width: 24px;
+        height: 24px;
+        stroke: white;
+      }
+
     </style>
   </head>
   <body>
@@ -500,6 +546,7 @@
           <img alt="Логотип" src="/static/img/лого.png" />
           <h1>Редактирование финансовой операции</h1>
         </div>
+        <span class="close-btn" id="closeEditModalBtn">&times;</span>
         <form id="editForm">
           <div>
             <input type="hidden" id="editIndex" />
@@ -605,8 +652,15 @@
             </div>
           </div>
           <div class="detailing-footer">
-            <button type="button" id="closeEditModalBtn">Отмена</button>
             <button type="submit" id="saveEditBtn" class="save-btn" disabled>Сохранить</button>
+            <button type="button" id="deleteBtn" class="delete-btn" aria-label="Удалить">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
           </div>
           <div class="loader" id="editLoader"></div>
           <div class="success-message" id="editSuccessMessage">
@@ -627,6 +681,7 @@
       const editModal = document.getElementById('editModal');
       const closeEditModalBtn = document.getElementById('closeEditModalBtn');
       const saveEditBtn = document.getElementById('saveEditBtn');
+      const deleteBtn = document.getElementById('deleteBtn');
       const editForm = document.getElementById('editForm');
       const financialForm = document.getElementById('financialForm');
 
@@ -647,6 +702,11 @@
       closeModalBtn.addEventListener('click', () => {
         detailModal.style.display = 'none';
       });
+
+      closeEditModalBtn.addEventListener('click', () => {
+        editModal.style.display = 'none';
+      });
+
 
       closeEditModalBtn.addEventListener('click', () => {
         editModal.style.display = 'none';
@@ -767,6 +827,50 @@
           date_finish: date_finish || ''
         };
       }
+
+      deleteBtn.addEventListener('click', () => {
+        const index = parseInt(document.getElementById('editIndex').value);
+        const operationId = document.getElementById('editOperationId').value;
+
+        document.getElementById('editLoader').style.display = 'block';
+        document.getElementById('editSuccessMessage').style.display = 'none';
+        document.getElementById('saveEditBtn').disabled = true;
+        document.getElementById('deleteBtn').disabled = true;
+
+        fetch(`/delete/${operationId}`, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (!response.ok) {
+            console.log(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Operation deleted:', data);
+
+          document.getElementById('editLoader').style.display = 'none';
+          document.getElementById('editSuccessMessage').textContent = 'Операция успешно удалена!';
+          document.getElementById('editSuccessMessage').style.display = 'block';
+          document.getElementById('saveEditBtn').disabled = false;
+          document.getElementById('deleteBtn').disabled = false;
+
+          financialOperations.splice(index, 1);
+
+          renderFinancialOperations();
+
+          setTimeout(() => {
+            document.getElementById('editSuccessMessage').style.display = 'none';
+            editModal.style.display = 'none';
+          }, 3000);
+        })
+        .catch(error => {
+          document.getElementById('editLoader').style.display = 'none';
+          document.getElementById('saveEditBtn').disabled = false;
+          document.getElementById('deleteBtn').disabled = false;
+          console.log('Произошла ошибка при удалении: ' + error.message);
+        });
+      });
 
      editForm.addEventListener('submit', function(event) {
         event.preventDefault();

@@ -85,6 +85,25 @@ class PaymentTypes(Base):
     name = Column(String, unique=True, nullable=False)
 
 
+class FinancialOperations(Base):
+    __tablename__ = "financial_operations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(String, nullable=False)  # current_time
+    username = Column(String, nullable=False)  # username
+    operation_date = Column(String, nullable=False)  # formatted_operation_date
+    operation_type = Column(String, nullable=False)  # operation_type
+    accounting_type = Column(String, nullable=False)  # accounting_type
+    account_type = Column(String, nullable=False)  # account_type
+    finish_date = Column(String)  # formatted_finish_date (nullable as it might not always exist)
+    amount = Column(String, nullable=False)  # amount
+    payment_type = Column(String, nullable=False)  # payment_type
+    comment = Column(String)  # comment (nullable as comments might be optional)
+    wallet = Column(String)
+    wallet_from = Column(String)
+    wallet_to = Column(String)
+
+
 # Создаем асинхронный engine для работы с базой данных SQLAlchemy
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
