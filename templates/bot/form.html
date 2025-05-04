@@ -694,7 +694,6 @@
       });
 
       detailBtn.addEventListener('click', () => {
-        console.log(financialOperations, 'financialOperations');
         renderFinancialOperations();
         detailModal.style.display = 'flex';
       });
@@ -875,12 +874,10 @@
      editForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
-        // Получение данных формы
         const index = parseInt(document.getElementById('editIndex').value);
         const editOperationId = document.getElementById('editOperationId').value;
         const operationType = document.getElementById('edit_operation_type').value;
         const amount = parseFloat(document.getElementById('edit_amount').value);
-        console.log(amount, 'amount')
 
         if (operationType === "Расход") {
             const walletSelect = document.getElementById('edit_wallet_select');
@@ -917,10 +914,6 @@
             }
         });
 
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-
         fetch(`/edit/${editOperationId}`, {
             method: 'PATCH',
             body: formData
@@ -932,8 +925,6 @@
             return response.json();
         })
         .then(data => {
-            console.log('Response from server:', data);
-
             document.getElementById('editLoader').style.display = 'none';
             document.getElementById('editSuccessMessage').style.display = 'block';
             document.getElementById('saveEditBtn').disabled = false;
@@ -1081,8 +1072,6 @@
       });
 
       document.getElementById('operation_type').addEventListener('change', function() {
-          console.log(document.getElementById('accounting_type').value, '1');
-          console.log(document.getElementById('account_type').value, '2');
           const selectedOperation = this.value;
           const categorySelect = document.getElementById('accounting_type');
           const accountTypeSelect = document.getElementById('account_type');
@@ -1155,7 +1144,6 @@
 
           const operationType = document.getElementById('operation_type').value;
           const amount = parseFloat(document.getElementById('amount').value);
-          console.log(amount)
 
           if (operationType === "Расход") {
               const walletSelect = document.getElementById('wallet_select');
@@ -1185,10 +1173,6 @@
 
           const formData = new FormData(this);
 
-          for (let [key, value] of formData.entries()) {
-              console.log(`${key}: ${value}`);
-          }
-
           fetch('/submit', {
               method: 'POST',
               body: formData
@@ -1202,6 +1186,7 @@
 
               setTimeout(() => {
                 document.getElementById('successMessage').style.display = 'none';
+                location.reload();
               }, 3000);
 
               if (operationType === "Расход") {
