@@ -43,7 +43,7 @@ class Wallets(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, unique=True, nullable=False)
     username = Column(Integer, ForeignKey("web_users.username"))
-    balance = Column(Numeric(10, 2), default=0)
+    balance = Column(Numeric(10, 2), default=0, nullable=False)
 
     web_user = relationship("WebUser", back_populates="wallets")
 
@@ -83,6 +83,25 @@ class PaymentTypes(Base):
     __tablename__ = "payment_types"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, unique=True, nullable=False)
+
+
+class FinancialOperations(Base):
+    __tablename__ = "financial_operations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(String, nullable=False)
+    username = Column(String, nullable=False)
+    operation_date = Column(String, nullable=False)
+    operation_type = Column(String, nullable=False)
+    accounting_type = Column(String, nullable=False)
+    account_type = Column(String, nullable=False)
+    finish_date = Column(String)
+    amount = Column(String, nullable=False)
+    payment_type = Column(String, nullable=False)
+    comment = Column(String)
+    wallet = Column(String)
+    wallet_from = Column(String)
+    wallet_to = Column(String)
 
 
 # Создаем асинхронный engine для работы с базой данных SQLAlchemy

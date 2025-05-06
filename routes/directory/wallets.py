@@ -123,7 +123,7 @@ async def add_wallet(
         return templates.TemplateResponse("not_access.html", {"request": request})
 
     try:
-        query = Wallets.__table__.insert().values(name=name, username=username)
+        query = Wallets.__table__.insert().values(name=name, username=username, balance=0)
         await db.execute(query)
         logger.info(f"Wallet added successfully: {name}")
     except Exception as e:
