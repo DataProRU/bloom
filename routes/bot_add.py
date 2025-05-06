@@ -303,7 +303,9 @@ async def edit_operation(
 
         fin_operation = await db.fetch_one(FinancialOperations.__table__.select().where(FinancialOperations.id == operation_id))
 
-        old_amout = int(fin_operation.amount)
+        old_amount = Decimal(fin_operation.amount) if fin_operation.amount else Decimal(0)
+        old_wallet_from = fin_operation.wallet_from
+        old_wallet_to = fin_operation.wallet_to
 
         query = (
             FinancialOperations.__table__
@@ -362,15 +364,15 @@ async def edit_operation(
 
             wallet_from_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == row.wallet_from))
             if wallet_from_instance:
-                new_balance = wallet_from_instance.balance - amount_decimal
+                new_balance = wallet_from_instance.balance + old_amount - amount_decimal
                 query = Wallets.__table__.update().where(Wallets.name == row.wallet_from).values(balance=new_balance)
                 await db.execute(query)
             else:
-                raise HTTPException(status_code=404, detail="Wallet from not found")
+                raise HTTPException(status_code=404, detail=f"Wallet from {row.wallet_from} not found")
 
             wallet_to_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == row.wallet_to))
             if wallet_to_instance:
-                new_balance = wallet_to_instance.balance + amount_decimal
+                new_balance = wallet_to_instance.balance - old_amount + amount_decimal
                 query = Wallets.__table__.update().where(Wallets.name == row.wallet_to).values(balance=new_balance)
                 await db.execute(query)
             else:
@@ -383,9 +385,9 @@ async def edit_operation(
             wallet_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == row.wallet))
             if wallet_instance:
                 if operation_type == "приход":
-                    new_balance_amount = amount_for_sheet - old_amout
+                    new_balance_amount = amount_for_sheet - old_amount
                 else:
-                    new_balance_amount =  old_amout - abs(amount_for_sheet)
+                    new_balance_amount = old_amount - abs(amount_for_sheet)
                 new_balance = wallet_instance.balance + new_balance_amount
                 query = Wallets.__table__.update().where(Wallets.name == row.wallet).values(balance=new_balance)
                 await db.execute(query)
@@ -429,7 +431,6 @@ async def edit_operation(
                 "updated_fields": list(update_data.keys())
             }
         )
-
 
     except Exception as e:
         logger.error(f"Ошибка при обновлении operation_id {operation_id}: {str(e)}")

@@ -565,7 +565,7 @@
             <div class="horizontal-container">
               <div id="edit_wallet_from" style="display: none">
                 <label for="edit_wallet_from_select">Кошелёк <br>(откуда):</label>
-                <select id="edit_wallet_from_select" name="wallet_from">
+                <select id="edit_wallet_from_select" name="wallet_from" disabled>
                   <option disabled selected value="">Выберите кошелёк</option>
                   {% for wallet in wallets %}
                   <option value="{{ wallet.name }}">
@@ -577,7 +577,7 @@
 
               <div id="edit_wallet_to" style="display: none">
                 <label for="edit_wallet_to_select">Кошелёк <br>(куда):</label>
-                <select id="edit_wallet_to_select" name="wallet_to">
+                <select id="edit_wallet_to_select" name="wallet_to" disabled>
                   <option disabled selected value="">Выберите кошелёк</option>
                   {% for wallet in wallets %}
                   <option value="{{ wallet.name }}">
@@ -699,7 +699,7 @@
       });
 
       closeModalBtn.addEventListener('click', () => {
-        detailModal.style.display = 'none';
+        location.reload();
       });
 
       closeEditModalBtn.addEventListener('click', () => {
@@ -876,14 +876,16 @@
         const editOperationId = document.getElementById('editOperationId').value;
         const operationType = document.getElementById('edit_operation_type').value;
         const amount = parseFloat(document.getElementById('edit_amount').value);
+        const originalOperation = financialOperations[index];
+        const originalAmount = parseFloat(originalOperation.amount) || 0;
 
         if (operationType === "Расход") {
             const walletSelect = document.getElementById('edit_wallet_select');
             const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
             const parts = selectedLabel.split(' ');
-            const money = parseFloat(parts[parts.length - 1]);
+            const currentBalance = parseFloat(parts[parts.length - 1]);
 
-            if (money - amount < 0) {
+            if (currentBalance + originalAmount - amount < 0) {
                 alert('Ошибка: Сумма указана ниже баланса кошелька');
                 return;
             }
@@ -938,14 +940,16 @@
                 const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
                 const parts = selectedLabel.split(' ');
                 const currentBalance = parseFloat(parts[parts.length - 1]);
-                const newBalance = currentBalance - amount;
+
+                const newBalance = currentBalance + originalAmount - amount;
                 walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
             } else if (operationType === "Приход") {
                 const walletSelect = document.getElementById('edit_wallet_select');
                 const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
                 const parts = selectedLabel.split(' ');
                 const currentBalance = parseFloat(parts[parts.length - 1]);
-                const newBalance = currentBalance + amount;
+
+                const newBalance = currentBalance - originalAmount + amount;
                 walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
             } else if (operationType === "Перемещение") {
                 const walletFromSelect = document.getElementById('edit_wallet_from_select');
@@ -969,10 +973,10 @@
                 const fromValue = walletFromSelect.value;
                 const toValue = walletToSelect.value;
 
+                updateBalanceInSelect(walletFromSelect, fromValue, originalAmount);
+                updateBalanceInSelect(walletToSelect, toValue, -originalAmount);
                 updateBalanceInSelect(walletFromSelect, fromValue, -amount);
                 updateBalanceInSelect(walletToSelect, toValue, amount);
-                updateBalanceInSelect(walletToSelect, fromValue, -amount);
-                updateBalanceInSelect(walletFromSelect, toValue, amount);
             }
 
             renderFinancialOperations();
