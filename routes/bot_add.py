@@ -165,10 +165,7 @@ async def submit_form(
             wallet_from=wallet_from,
             wallet_to=wallet_to
         )
-        await db.execute(query)
-
-        last_id_query = "SELECT last_insert_rowid()"
-        operation_id = await db.fetch_val(last_id_query)
+        operation_id = await db.execute(query)
 
         new_row = [
             current_time,
@@ -184,14 +181,17 @@ async def submit_form(
         ]
 
         if operation_type == "Перемещение":
-            new_row.append(wallet_from)
-            new_row[7] = -new_row[7]
-            new_row.append(operation_id)  # Добавляем id операции
-            worksheet.append_row(new_row, value_input_option="USER_ENTERED")
-            new_row[-1] = wallet_to
-            new_row[7] = -new_row[7]
-            new_row[-1] = operation_id  # Добавляем тот же id операции
-            worksheet.append_row(new_row, value_input_option="USER_ENTERED")
+            row_from = new_row.copy()
+            row_from[7] = -abs(row_from[7])
+            row_from.append(wallet_from)
+            row_from.append(operation_id)
+            worksheet.append_row(row_from, value_input_option="USER_ENTERED")
+
+            row_to = new_row.copy()
+            row_to[7] = abs(row_to[7])
+            row_to.append(wallet_to)
+            row_to.append(operation_id)
+            worksheet.append_row(row_to, value_input_option="USER_ENTERED")
             wallet_from_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == wallet_from))
             if wallet_from_instance:
                 new_balance = wallet_from_instance.balance - Decimal(amount)
@@ -208,7 +208,7 @@ async def submit_form(
                 raise HTTPException(status_code=404, detail="Wallet not found")
         else:
             new_row.append(wallet)
-            new_row.append(operation_id)  # Добавляем id операции
+            new_row.append(operation_id)
             worksheet.append_row(new_row, value_input_option="USER_ENTERED")
             wallet_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == wallet))
             if wallet_instance:
@@ -218,7 +218,6 @@ async def submit_form(
             else:
                 raise HTTPException(status_code=404, detail="Wallet not found")
 
-        # Получаем текущий размер таблицы
         num_rows = len(worksheet.get_all_values())
         num_cols = len(worksheet.get_all_values()[0]) if num_rows > 0 else 0
 

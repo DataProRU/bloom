@@ -555,7 +555,7 @@
             <label for="edit_date">Дата:</label>
             <input id="edit_date" name="date" required type="date" />
             <label for="edit_operation_type">Вид операции:</label>
-            <select id="edit_operation_type" name="operation_type" required>
+            <select id="edit_operation_type" name="operation_type" disabled required>
               <option disabled value="">Выберите вид операции</option>
               {% for operation in operations %}
               <option value="{{ operation.name }}">{{ operation.name }}</option>
@@ -841,13 +841,11 @@
         })
         .then(response => {
           if (!response.ok) {
-            console.log(`HTTP error! status: ${response.status}`);
+            alert(`HTTP error! status: ${response.status}`);
           }
           return response.json();
         })
         .then(data => {
-          console.log('Operation deleted:', data);
-
           document.getElementById('editLoader').style.display = 'none';
           document.getElementById('editSuccessMessage').textContent = 'Операция успешно удалена!';
           document.getElementById('editSuccessMessage').style.display = 'block';
@@ -867,7 +865,7 @@
           document.getElementById('editLoader').style.display = 'none';
           document.getElementById('saveEditBtn').disabled = false;
           document.getElementById('deleteBtn').disabled = false;
-          console.log('Произошла ошибка при удалении: ' + error.message);
+          alert('Произошла ошибка при удалении: ' + error.message);
         });
       });
 
@@ -886,7 +884,7 @@
             const money = parseFloat(parts[parts.length - 1]);
 
             if (money - amount < 0) {
-                console.log('Ошибка: Сумма указана ниже баланса кошелька');
+                alert('Ошибка: Сумма указана ниже баланса кошелька');
                 return;
             }
         } else if (operationType === "Перемещение") {
@@ -896,7 +894,7 @@
             const money = parseFloat(parts[parts.length - 1]);
 
             if (money - amount < 0) {
-                console.log('Ошибка: Сумма указана ниже баланса кошелька, откуда переводятся средства');
+                alert('Ошибка: Сумма указана ниже баланса кошелька, откуда переводятся средства');
                 return;
             }
         }
@@ -987,7 +985,7 @@
         .catch(error => {
             document.getElementById('editLoader').style.display = 'none';
             document.getElementById('saveEditBtn').disabled = false;
-            console.log('Произошла ошибка: ' + error.message);
+            alert('Произошла ошибка: ' + error.message);
         });
     });
 
@@ -1152,7 +1150,7 @@
               const money = parseFloat(parts[parts.length - 1]);
 
               if (money - amount < 0) {
-                  console.log('Ошибка: Сумма указана ниже баланса кошелька');
+                  alert('Ошибка: Сумма указана ниже баланса кошелька');
                   document.getElementById('loader').style.display = 'none';
                   document.getElementById('submitButton').disabled = false;
                   return;
@@ -1164,7 +1162,7 @@
               const money = parseFloat(parts[parts.length - 1]);
 
               if (money - amount < 0) {
-                  console.log('Ошибка: Сумма указана ниже баланса кошелька, откуда переводятся средства');
+                  alert('Ошибка: Сумма указана ниже баланса кошелька, откуда переводятся средства');
                   document.getElementById('loader').style.display = 'none';
                   document.getElementById('submitButton').disabled = false;
                   return;
@@ -1242,7 +1240,7 @@
           .catch(error => {
               document.getElementById('loader').style.display = 'none';
               document.getElementById('submitButton').disabled = false;
-              console.log('Произошла ошибка: ' + error.message);
+              alert('Произошла ошибка: ' + error.message);
           });
       });
     </script>

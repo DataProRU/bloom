@@ -89,16 +89,16 @@ class FinancialOperations(Base):
     __tablename__ = "financial_operations"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    timestamp = Column(String, nullable=False)  # current_time
-    username = Column(String, nullable=False)  # username
-    operation_date = Column(String, nullable=False)  # formatted_operation_date
-    operation_type = Column(String, nullable=False)  # operation_type
-    accounting_type = Column(String, nullable=False)  # accounting_type
-    account_type = Column(String, nullable=False)  # account_type
-    finish_date = Column(String)  # formatted_finish_date (nullable as it might not always exist)
-    amount = Column(String, nullable=False)  # amount
-    payment_type = Column(String, nullable=False)  # payment_type
-    comment = Column(String)  # comment (nullable as comments might be optional)
+    timestamp = Column(String, nullable=False)
+    username = Column(String, nullable=False)
+    operation_date = Column(String, nullable=False)
+    operation_type = Column(String, nullable=False)
+    accounting_type = Column(String, nullable=False)
+    account_type = Column(String, nullable=False)
+    finish_date = Column(String)
+    amount = Column(String, nullable=False)
+    payment_type = Column(String, nullable=False)
+    comment = Column(String)
     wallet = Column(String)
     wallet_from = Column(String)
     wallet_to = Column(String)
