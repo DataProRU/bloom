@@ -641,7 +641,7 @@
 
             <div id="edit_wallet">
               <label for="edit_wallet_select">Кошелёк:</label>
-              <select id="edit_wallet_select" name="wallet">
+              <select id="edit_wallet_select" name="wallet" disabled>
                 <option disabled selected value="">Выберите кошелёк</option>
                 {% for wallet in wallets %}
                 <option value="{{ wallet.name }}">
