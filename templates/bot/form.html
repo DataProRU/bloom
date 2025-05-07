@@ -830,6 +830,7 @@
       deleteBtn.addEventListener('click', () => {
         const index = parseInt(document.getElementById('editIndex').value);
         const operationId = document.getElementById('editOperationId').value;
+        const operation = financialOperations[index];
 
         document.getElementById('editLoader').style.display = 'block';
         document.getElementById('editSuccessMessage').style.display = 'none';
@@ -852,20 +853,53 @@
           document.getElementById('saveEditBtn').disabled = false;
           document.getElementById('deleteBtn').disabled = false;
 
+          const amount = parseFloat(operation.amount) || 0;
+          const operationType = operation.operation_type.toLowerCase();
+
+          function updateBalanceInSelect(walletValue, amountChange) {
+              const selects = [
+                  document.getElementById('wallet_select'),
+                  document.getElementById('edit_wallet_select'),
+                  document.getElementById('wallet_from_select'),
+                  document.getElementById('edit_wallet_from_select'),
+                  document.getElementById('wallet_to_select'),
+                  document.getElementById('edit_wallet_to_select')
+              ].filter(sel => sel !== null);
+
+              selects.forEach(select => {
+                  const option = Array.from(select.options).find(opt => opt.value === walletValue);
+                  if (option) {
+                      const parts = option.text.split(' ');
+                      const currentBalance = parseFloat(parts[parts.length - 1]);
+                      const newBalance = currentBalance + amountChange;
+                      option.text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+                  }
+              });
+          }
+
+          if (operationType === 'расход') {
+              updateBalanceInSelect(operation.wallet, amount);
+          } else if (operationType === 'приход') {
+              updateBalanceInSelect(operation.wallet, -amount);
+          } else if (operationType === 'перемещение') {
+              updateBalanceInSelect(operation.wallet_from, amount);
+              updateBalanceInSelect(operation.wallet_to, -amount);
+          }
+
           financialOperations.splice(index, 1);
 
           renderFinancialOperations();
 
           setTimeout(() => {
-            document.getElementById('editSuccessMessage').style.display = 'none';
-            editModal.style.display = 'none';
+              document.getElementById('editSuccessMessage').style.display = 'none';
+              editModal.style.display = 'none';
           }, 3000);
         })
         .catch(error => {
-          document.getElementById('editLoader').style.display = 'none';
-          document.getElementById('saveEditBtn').disabled = false;
-          document.getElementById('deleteBtn').disabled = false;
-          alert('Произошла ошибка при удалении: ' + error.message);
+            document.getElementById('editLoader').style.display = 'none';
+            document.getElementById('saveEditBtn').disabled = false;
+            document.getElementById('deleteBtn').disabled = false;
+            alert('Произошла ошибка при удалении: ' + error.message);
         });
       });
 
