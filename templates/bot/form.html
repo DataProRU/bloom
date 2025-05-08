@@ -279,10 +279,10 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
         z-index: 1000;
         justify-content: center;
         align-items: center;
+        overflow-y: auto;
       }
 
       .detailing-content {
@@ -291,7 +291,6 @@
         padding: 30px;
         border-radius: 16px;
         max-width: 500px;
-        width: 90%;
         box-sizing: border-box;
         position: relative;
       }
@@ -337,10 +336,10 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.4);
+        z-index: 2001;
         justify-content: center;
         align-items: center;
-        z-index: 2001;
+        overflow: auto;
       }
 
       .edit-modal-content {
@@ -348,7 +347,8 @@
         padding: 30px;
         border-radius: 16px;
         max-width: 500px;
-        width: 90%;
+        height: 808px;
+        width: 100%;
         box-sizing: border-box;
         position: relative;
       }
@@ -358,10 +358,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-      }
-
-      #edit_comment {
-          min-height: 100px;
+        background: #ffff;
       }
 
       .close-btn {
@@ -405,6 +402,13 @@
         width: 24px;
         height: 24px;
         stroke: white;
+      }
+
+      .modal-scroll-wrapper {
+        max-height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
       }
 
     </style>
@@ -526,7 +530,8 @@
     </div>
 
     <div class="detailing" id="detailModal">
-      <div class="detailing-content">
+      <div class="modal-scroll-wrapper">
+        <div class="detailing-content">
         <div class="header">
           <img alt="Логотип" src="/static/img/лого.png" />
           <h1>Детализация</h1>
@@ -538,135 +543,138 @@
           <button id="closeModalBtn" type="button">Назад</button>
         </div>
       </div>
+      </div>
     </div>
 
     <div class="edit-modal" id="editModal">
-      <div class="edit-modal-content">
-        <div class="header">
-          <img alt="Логотип" src="/static/img/лого.png" />
-          <h1>Редактирование финансовой операции</h1>
-        </div>
-        <span class="close-btn" id="closeEditModalBtn">&times;</span>
-        <form id="editForm">
-          <div>
-            <input type="hidden" id="editIndex" />
-            <input type="hidden" id="editOperationId" name="operation_id" />
-
-            <label for="edit_date">Дата:</label>
-            <input id="edit_date" name="date" required type="date" />
-            <label for="edit_operation_type">Вид операции:</label>
-            <select id="edit_operation_type" name="operation_type" disabled required>
-              <option disabled value="">Выберите вид операции</option>
-              {% for operation in operations %}
-              <option value="{{ operation.name }}">{{ operation.name }}</option>
-              {% endfor %}
-            </select>
-
-            <div class="horizontal-container">
-              <div id="edit_wallet_from" style="display: none">
-                <label for="edit_wallet_from_select">Кошелёк <br>(откуда):</label>
-                <select id="edit_wallet_from_select" name="wallet_from" disabled>
-                  <option disabled selected value="">Выберите кошелёк</option>
-                  {% for wallet in wallets %}
-                  <option value="{{ wallet.name }}">
-                    {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
-                  </option>
-                  {% endfor %}
-                </select>
-              </div>
-
-              <div id="edit_wallet_to" style="display: none">
-                <label for="edit_wallet_to_select">Кошелёк <br>(куда):</label>
-                <select id="edit_wallet_to_select" name="wallet_to" disabled>
-                  <option disabled selected value="">Выберите кошелёк</option>
-                  {% for wallet in wallets %}
-                  <option value="{{ wallet.name }}">
-                    {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
-                  </option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
-
-            <div class="horizontal-container">
-              <div>
-                <label for="edit_accounting_type">Категория:</label>
-                <select id="edit_accounting_type" name="accounting_type" required>
-                  <option disabled selected value="">Выберите категорию</option>
-                </select>
-              </div>
-              <div>
-                <label for="edit_account_type">Статья:</label>
-                <select id="edit_account_type" name="account_type">
-                  <option value="" selected>Не выбрано</option>
-                </select>
-              </div>
-            </div>
-
+      <div class="modal-scroll-wrapper">
+        <div class="edit-modal-content">
+          <div class="header">
+            <img alt="Логотип" src="/static/img/лого.png" />
+            <h1>Редактирование финансовой операции</h1>
+          </div>
+          <span class="close-btn" id="closeEditModalBtn">&times;</span>
+          <form id="editForm">
             <div>
-              <label for="edit_date_finish">Дата назначения:</label>
-              <input id="edit_date_finish" name="date_finish" required type="date" />
-            </div>
+              <input type="hidden" id="editIndex" />
+              <input type="hidden" id="editOperationId" name="operation_id" />
 
-            <div class="horizontal-container">
-              <div>
-                <label for="edit_amount">Сумма:</label>
-                <input
-                  id="edit_amount"
-                  name="amount"
-                  placeholder="Введите сумму"
-                  required
-                  type="number"
-                />
-              </div>
-              <div>
-                <label class="payment-type-label" for="edit_payment_type">Способ оплаты:</label>
-                <select id="edit_payment_type" name="payment_type" required>
-                  <option disabled selected value="">Выберите тип оплаты</option>
-                  {% for payment_type in payment_types %}
-                  <option value="{{ payment_type.name }}">
-                    {{ payment_type.name }}
-                  </option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
-
-            <label for="edit_comment">Назначение платежа:</label>
-            <textarea
-              id="edit_comment"
-              name="comment"
-              placeholder="Введите комментарий"
-            ></textarea>
-
-            <div id="edit_wallet">
-              <label for="edit_wallet_select">Кошелёк:</label>
-              <select id="edit_wallet_select" name="wallet" disabled>
-                <option disabled selected value="">Выберите кошелёк</option>
-                {% for wallet in wallets %}
-                <option value="{{ wallet.name }}">
-                  {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
-                </option>
+              <label for="edit_date">Дата:</label>
+              <input id="edit_date" name="date" required type="date" />
+              <label for="edit_operation_type">Вид операции:</label>
+              <select id="edit_operation_type" name="operation_type" disabled required>
+                <option disabled value="">Выберите вид операции</option>
+                {% for operation in operations %}
+                <option value="{{ operation.name }}">{{ operation.name }}</option>
                 {% endfor %}
               </select>
+
+              <div class="horizontal-container">
+                <div id="edit_wallet_from" style="display: none">
+                  <label for="edit_wallet_from_select">Кошелёк <br>(откуда):</label>
+                  <select id="edit_wallet_from_select" name="wallet_from" disabled>
+                    <option disabled selected value="">Выберите кошелёк</option>
+                    {% for wallet in wallets %}
+                    <option value="{{ wallet.name }}">
+                      {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div id="edit_wallet_to" style="display: none">
+                  <label for="edit_wallet_to_select">Кошелёк <br>(куда):</label>
+                  <select id="edit_wallet_to_select" name="wallet_to" disabled>
+                    <option disabled selected value="">Выберите кошелёк</option>
+                    {% for wallet in wallets %}
+                    <option value="{{ wallet.name }}">
+                      {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <div class="horizontal-container">
+                <div>
+                  <label for="edit_accounting_type">Категория:</label>
+                  <select id="edit_accounting_type" name="accounting_type" required>
+                    <option disabled selected value="">Выберите категорию</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="edit_account_type">Статья:</label>
+                  <select id="edit_account_type" name="account_type">
+                    <option value="" selected>Не выбрано</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="edit_date_finish">Дата назначения:</label>
+                <input id="edit_date_finish" name="date_finish" required type="date" />
+              </div>
+
+              <div class="horizontal-container">
+                <div>
+                  <label for="edit_amount">Сумма:</label>
+                  <input
+                    id="edit_amount"
+                    name="amount"
+                    placeholder="Введите сумму"
+                    required
+                    type="number"
+                  />
+                </div>
+                <div>
+                  <label class="payment-type-label" for="edit_payment_type">Способ оплаты:</label>
+                  <select id="edit_payment_type" name="payment_type" required>
+                    <option disabled selected value="">Выберите тип оплаты</option>
+                    {% for payment_type in payment_types %}
+                    <option value="{{ payment_type.name }}">
+                      {{ payment_type.name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <label for="edit_comment">Назначение платежа:</label>
+              <textarea
+                id="edit_comment"
+                name="comment"
+                placeholder="Введите комментарий"
+              ></textarea>
+
+              <div id="edit_wallet">
+                <label for="edit_wallet_select">Кошелёк:</label>
+                <select id="edit_wallet_select" name="wallet" disabled>
+                  <option disabled selected value="">Выберите кошелёк</option>
+                  {% for wallet in wallets %}
+                  <option value="{{ wallet.name }}">
+                    {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
-          </div>
-          <div class="detailing-footer">
-            <button type="submit" id="saveEditBtn" class="save-btn" disabled>Сохранить</button>
-            <button type="button" id="deleteBtn" class="delete-btn" aria-label="Удалить">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                <line x1="10" y1="11" x2="10" y2="17"></line>
-                <line x1="14" y1="11" x2="14" y2="17"></line>
-              </svg>
-            </button>
-          </div>
-          <div class="loader" id="editLoader"></div>
-          <div class="success-message" id="editSuccessMessage">
-            Данные успешно обновлены!
-          </div>
-        </form>
+            <div class="detailing-footer">
+              <button type="submit" id="saveEditBtn" class="save-btn" disabled>Сохранить</button>
+              <button type="button" id="deleteBtn" class="delete-btn" aria-label="Удалить">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+            </div>
+            <div class="loader" id="editLoader"></div>
+            <div class="success-message" id="editSuccessMessage">
+              Данные успешно обновлены!
+            </div>
+          </form>
+      </div>
       </div>
     </div>
 
