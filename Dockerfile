@@ -14,11 +14,8 @@ RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 # Копируем все файлы проекта
 COPY . .
-
-
 
 # Указываем команду по умолчанию для запуска приложения через uvicorn
 CMD ["sh", "-c", "python bot.py & uvicorn main:app --host 0.0.0.0 --port 8000 --reload"]

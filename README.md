@@ -1,4 +1,4 @@
-1) bild docker image
+1) build docker image
 
 docker build -t my-python-app .
 

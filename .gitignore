@@ -11,3 +11,5 @@ backup.sql
 venv/
 .venv/
 eq_rental.db
+
+.env

@@ -1,17 +1,21 @@
 import asyncio
+import os
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from aiogram.filters import Command
 from sqlalchemy import create_engine, Column, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-# Укажите ваш токен от BotFather
-BOT_TOKEN = "7382155025:AAHDSIkwnZRKMq2waIBYAw1Z7QkhWjCnJOQ"
-DATABASE_URL = "sqlite:///./eq_rental.db"
+load_dotenv()
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # URL мини-приложения
-WEB_APP_URL = "https://garage-garageshop.amvera.io/tg_bot_add"
+WEB_APP_URL = os.getenv("WEB_APP_URL")
 
 # Инициализация бота
 bot = Bot(token=BOT_TOKEN)

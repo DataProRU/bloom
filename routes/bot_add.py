@@ -1,10 +1,10 @@
+import os
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 import logging
 import gspread
 from sqlalchemy import desc
-from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
 from fastapi import status
 
@@ -16,6 +16,11 @@ from fastapi.templating import Jinja2Templates
 from pytz import timezone
 from dependencies import get_token_from_cookie
 from fastapi.responses import RedirectResponse
+from dotenv import load_dotenv
+
+from utils.wallets import update_wallets_on_google_sheet
+
+load_dotenv()
 
 app = FastAPI()
 router = APIRouter()
@@ -27,11 +32,12 @@ logger = logging.getLogger(__name__)
 
 # Инициализация gspread
 try:
-    gc = gspread.service_account(filename="credentials.json")
+    gc = gspread.service_account(filename=os.getenv('GOOGLE_TABLES_CREDENTIALS_FILE'))
     sht2 = gc.open_by_url(
-        'https://docs.google.com/spreadsheets/d/1dvW23dQyYB0D6afUYAj1L6mp-xl7DJ5W1GFLIHOxxp0/edit?gid=429053782#gid=429053782'
+        os.getenv("GOOGLE_TABLES_URL")
     )
     worksheet = sht2.get_worksheet(0)
+    balances_worksheet = sht2.get_worksheet(1)
 except Exception as e:
     print(f"Ошибка при инициализации gspread: {str(e)}")
 
@@ -60,11 +66,15 @@ async def get_form(
     categories = await db.fetch_all(Categories.__table__.select())
     articles = await db.fetch_all(Articles.__table__.select())
     wallets = await db.fetch_all(Wallets.__table__.select())
-    operationsList = await db.fetch_all(
+    operations_list = await db.fetch_all(
         FinancialOperations.__table__
         .select()
         .where(FinancialOperations.username == username)
-        .order_by(desc(FinancialOperations.timestamp))
+    )
+
+    operations_list.sort(
+        key=lambda x: datetime.strptime(x["timestamp"], "%d.%m.%Y %H:%M:%S"),
+        reverse=True
     )
 
     # Преобразуем данные в нужный формат
@@ -99,7 +109,7 @@ async def get_form(
             'wallet_from': row.wallet_from,
             'wallet_to': row.wallet_to
         }
-        for row in operationsList
+        for row in operations_list
     ]
     return templates.TemplateResponse(
         "bot/form.html",
@@ -217,6 +227,8 @@ async def submit_form(
                 await db.execute(query)
             else:
                 raise HTTPException(status_code=404, detail="Wallet not found")
+
+        await update_wallets_on_google_sheet(db, balances_worksheet)
 
         num_rows = len(worksheet.get_all_values())
         num_cols = len(worksheet.get_all_values()[0]) if num_rows > 0 else 0
@@ -392,6 +404,8 @@ async def edit_operation(
             else:
                 raise HTTPException(status_code=404, detail="Wallet not found")
 
+        await update_wallets_on_google_sheet(db, balances_worksheet)
+
         num_rows = len(worksheet.get_all_values())
         num_cols = len(worksheet.get_all_values()[0]) if num_rows > 0 else 0
 
@@ -529,6 +543,8 @@ async def delete_operation(
 
         num_rows = len(worksheet.get_all_values())
         num_cols = len(worksheet.get_all_values()[0]) if num_rows > 0 else 0
+
+        await update_wallets_on_google_sheet(db, balances_worksheet)
 
         if num_cols >= 1:
             worksheet.format(f'A1:A{num_rows}', {

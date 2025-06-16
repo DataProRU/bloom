@@ -1,3 +1,4 @@
+import os
 from enum import unique
 
 from databases import Database
@@ -6,12 +7,15 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import Column, Integer, String, ForeignKey, MetaData, create_engine, Boolean, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 # Строка подключения к базе данных
-DATABASE_URL = "sqlite:///./eq_rental.db"
+DATABASE_URL = os.getenv("DATABASE_URL")
 database = Database(DATABASE_URL)
 metadata = MetaData()
 
