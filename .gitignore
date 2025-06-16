@@ -1,0 +1,15 @@
+.idea
+__pycache__
+venv_name
+.DS_Store
+credentials.json
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+idea/
+backup.sql
+venv/
+.venv/
+eq_rental.db
+
+.env

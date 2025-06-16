@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #00aaff, #f06); /* Градиентный фон */
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+        }
+
+        .form-wrapper {
+            max-width: 400px;
+            width: 100%;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.9); /* Полупрозрачный фон формы */
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Мягкая тень */
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-wrapper:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Эффект тени при наведении */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        label {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #00aaff; /* Цвет границы при фокусе */
+        }
+
+        #password-strength {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        button {
+            cursor: pointer;
+            width: 100%;
+            padding: 12px;
+            background-color: #00aaff; /* Основной цвет кнопки */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #008fcc;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #error-message {
+            color: red;
+            text-align: center;
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: red;
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        function checkPasswordStrength() {
+            const password = document.getElementById("password").value;
+            const strengthIndicator = document.getElementById("password-strength");
+            let strength = 0;
+
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            switch (strength) {
+                case 0:
+                case 1:
+                    strengthIndicator.textContent = "Weak";
+                    strengthIndicator.style.color = "red";
+                    break;
+                case 2:
+                    strengthIndicator.textContent = "Medium";
+                    strengthIndicator.style.color = "orange";
+                    break;
+                case 3:
+                case 4:
+                    strengthIndicator.textContent = "Strong";
+                    strengthIndicator.style.color = "green";
+                    break;
+            }
+        }
+
+        function validateForm(event) {
+            const password = document.getElementById("password").value;
+            const strengthIndicator = document.getElementById("password-strength");
+            const errorMessage = document.getElementById("error-message");
+
+            let strength = 0;
+
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            if (strength < 2) {
+                errorMessage.textContent = "Password too weak. Use at least 8 characters including upper and lower case letters, numbers, and special symbols.";
+                errorMessage.style.display = "block";
+                event.preventDefault();
+            } else {
+                errorMessage.style.display = "none";
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="form-wrapper">
+    <h2>Register</h2>
+    <form action="/register" method="post" onsubmit="validateForm(event)">
+        <div class="form-group">
+            <label>Username</label>
+            <input name="username" placeholder="Enter your username" required type="text">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input id="password" name="password" oninput="checkPasswordStrength()" placeholder="Enter your password" required
+                   type="password">
+            <div id="password-strength"></div>
+        </div>
+        <div class="form-group">
+            <label>Role</label>
+            <select name="role">
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+                <!-- Add more roles as needed -->
+            </select>
+        </div>
+        <div id="error-message"></div>
+        <button type="submit">Register</button>
+    </form>
+</div>
+
+</body>
+</html>

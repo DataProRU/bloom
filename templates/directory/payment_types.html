@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Управление типами оплаты</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f8fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #2a6fb3;
+        }
+
+        table {
+            width: 60%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            width: 90%;
+        }
+
+        th {
+            background-color: #2a6fb3;
+            color: white;
+        }
+
+        td {
+            background-color: #f9fbff;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #eef5fc;
+        }
+
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        button:active {
+            background-color: #285a8e;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #2a6fb3;
+        }
+
+        .modal-content button {
+            width: auto;
+        }
+
+        .modal-content .close {
+            background: #e74c3c;
+            color: white;
+            float: right;
+            padding: 5px 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+        }
+
+        .modal-content .close:hover {
+            background: #c0392b;
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+
+        form input, form select, form button {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        form button {
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .fixed-width-button {
+            height: 70%;
+            width: 100px; /* Adjust the width as needed */
+        }
+    </style>
+</head>
+<body>
+<h1>Управление типами оплаты</h1>
+<div style="text-align: right; margin-bottom: 20px; margin-right: 20px;">
+    <a href="/directory">
+        <button>Назад</button>
+    </a>
+</div>
+
+<!-- Button to add a new metric -->
+<div style="text-align: center; margin-bottom: 20px;">
+    <button onclick="showModal('add-modal')">Добавление нового типа оплаты</button>
+</div>
+
+<!-- Metric List -->
+<table>
+    <thead>
+    <tr>
+        <th>Название типа</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for payment_type in payment_types %}
+    <tr>
+        <td>{{ payment_type.name }}</td>
+        <td class="action-buttons">
+            <button class="fixed-width-button" onclick="showEditForm({{ payment_type.id }}, '{{ payment_type.name }}')">
+                Изменить
+            </button>
+            <form action="/payment_types/{{ payment_type.id }}/delete/" method="post" style="display:inline;">
+                <button class="fixed-width-button" onclick="return confirm('Вы точно хотите удалить этот тип оплаты?');"
+                        type="submit">Удалить
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<!-- Add Payment Type Modal -->
+<div class="modal" id="add-modal">
+    <div class="modal-content">
+        <button class="close" onclick="closeModal('add-modal')">&times;</button>
+        <h2>Добавление нового типа оплаты</h2>
+        <form action="/payment_types/add/" method="post">
+            <label for="new-payment_type-name">Название типа оплаты:</label>
+            <input id="new-payment_type-name" name="name" required type="text">
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Payment Type Modal -->
+<div class="modal" id="edit-modal">
+    <div class="modal-content">
+        <button class="close" onclick="closeModal('edit-modal')">&times;</button>
+        <h2>Изменение типа оплаты</h2>
+        <form id="edit-form" method="post">
+            <input id="edit-payment_type-id" name="user_id" type="hidden">
+            <label for="edit-payment_type-name">Название типа оплаты:</label>
+            <input id="edit-payment_type-name" name="name" required type="text">
+            <button type="submit">Сохранить изменения</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Show the modal
+    function showModal(modalId) {
+        document.getElementById(modalId).classList.add('active');
+    }
+
+    // Close the modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Show the edit form with pre-filled data
+    function showEditForm(id, name) {
+        const modal = document.getElementById('edit-modal');
+        const form = document.getElementById('edit-form');
+
+        // Fill the form with metric data
+        document.getElementById('edit-payment_type-id').value = id;
+        document.getElementById('edit-payment_type-name').value = name;
+
+        // Set form action
+        form.action = `/payment_types/${id}/edit/`;
+
+        // Show the modal
+        modal.classList.add('active');
+    }
+</script>
+</body>
+</html>

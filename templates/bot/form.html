@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="192x192"
+      href="/static/img/android-chrome-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/static/img/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/static/img/favicon-16x16.png"
+    />
+    <title>Форма для операции</title>
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #eaeef3;
+        color: #333;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .form-container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        max-width: 500px;
+        width: 90%;
+        box-sizing: border-box;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .form-container:hover {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .header img {
+        height: 50px;
+        margin-right: 15px;
+      }
+
+      #detailBtn {
+        width: 71px;
+        word-wrap: break-word;
+        font-size: 13px;
+        margin-left: 15px;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 26px;
+        color: #2c3e50;
+      }
+
+      label {
+        font-weight: 500;
+        margin-bottom: 5px;
+        display: block;
+        color: #555;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        background-color: #f9f9f9;
+        box-sizing: border-box;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+        background-color: #fff;
+        outline: none;
+      }
+
+      textarea {
+        resize: vertical;
+        margin-bottom: 10px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      button:disabled {
+        background-color: #cccccc;
+        color: #666666;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      input[type="date"] {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        padding: 12px;
+        width: 100%;
+        box-sizing: border-box;
+        color: #555;
+        cursor: pointer;
+      }
+
+      input[type="date"]:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+        background-color: #fff;
+        outline: none;
+      }
+
+      select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        color: #555;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='%23555'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 12px 12px;
+      }
+
+      select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+        background-color: #fff;
+        outline: none;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      input[type="number"] {
+        -moz-appearance: textfield; /* Firefox */
+      }
+
+      /* Стили для горизонтального контейнера */
+      .horizontal-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px; /* Расстояние между элементами */
+        align-items: flex-start; /* Выравнивание элементов по верхнему краю */
+        flex-wrap: nowrap; /* Запрет на перенос элементов на новую строку */
+      }
+
+      .horizontal-container > div {
+        flex: 1; /* Равномерное распределение пространства */
+      }
+
+      /* Адаптивные стили для мобильных устройств */
+      @media (max-width: 480px) {
+        .horizontal-container {
+          gap: 10px; /* Уменьшаем расстояние между элементами */
+        }
+
+        .horizontal-container > div {
+          flex: 1 1 45%; /* Элементы занимают 45% ширины, чтобы поместиться в одну строку */
+        }
+
+        .payment-type-label {
+            font-size: 14px;
+        }
+      }
+
+      /* Стили для лоадера */
+      .loader {
+        display: none;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 2s linear infinite;
+        position: absolute;
+        top: 50%;
+        left: 40%;
+        transform: translate(-50%, -50%);
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Стили для сообщения об успешной загрузке */
+      .success-message {
+        display: none;
+        background-color: #d4edda;
+        color: #155724;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 16px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        box-sizing: border-box;
+      }
+
+      .detailing {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;
+      }
+
+      .detailing-content {
+        height: 780px;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        max-width: 500px;
+        box-sizing: border-box;
+        position: relative;
+      }
+
+      .detailing-body {
+        height: calc(100% - 152px);
+        overflow: auto;
+      }
+
+      .modal-button {
+        color: #000;
+        background-color: #f8f9fa;
+        border: 1px solid #f8f9fa;
+        text-align: start;
+        margin: 10px 0;
+        word-wrap: break-word;
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .modal-button:hover {
+        color: #000;
+        background-color: #e2e6ea;
+        border-color: #dae0e5;
+      }
+
+      .modal-button span:not(:last-child) {
+        margin-right: 20px;
+      }
+
+      .detailing-footer {
+        display: flex;
+        gap: 34px;
+        margin-top: 20px;
+      }
+
+      .edit-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2001;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+      }
+
+      .edit-modal-content {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        max-width: 500px;
+        height: 845px;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+      }
+
+      #editForm {
+        min-height: 619px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: #ffff;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 9px;
+        right: 15px;
+        font-size: 32px;
+        color: #555;
+        cursor: pointer;
+        transition: color 0.3s ease, transform 0.2s ease;
+      }
+
+      .close-btn:hover {
+        color: #007bff;
+        transform: scale(1.2);
+      }
+
+      .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        width: 62px;
+        height: 52px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+
+      .delete-btn:hover {
+        background-color: #c82333;
+      }
+
+      .delete-btn:active {
+        transform: scale(0.98);
+      }
+
+      .delete-btn svg {
+        width: 24px;
+        height: 24px;
+        stroke: white;
+      }
+
+      .modal-scroll-wrapper {
+        max-height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+      }
+
+      textarea {
+        max-height: 70px;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #2c3e50;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <div class="header">
+        <img alt="Логотип" src="/static/img/лого.png" />
+        <h1>Финансовый отчёт</h1>
+        <button id="detailBtn" type="button">Детализация</button>
+      </div>
+      <form id="financialForm">
+        <label for="date">Дата:</label>
+        <input id="date" name="date" required type="date" />
+        <label for="operation_type">Вид операции:</label>
+        <input name="username" type="hidden" value="{{ username }}" />
+        <select id="operation_type" name="operation_type" required>
+          <option disabled selected value="">Выберите вид операции</option>
+          {% for operation in operations %}
+          <option value="{{ operation.name }}">{{ operation.name }}</option>
+          {% endfor %}
+        </select>
+
+        <div class="horizontal-container">
+          <div id="wallet_from" style="display: none">
+            <label for="wallet_from_select">Кошелёк <br>(откуда):</label>
+            <select id="wallet_from_select" name="wallet_from">
+              <option disabled selected value="">Выберите кошелёк</option>
+              {% for wallet in wallets %}
+              <option value="{{ wallet.name }}">
+                {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div id="wallet_to" style="display: none">
+            <label for="wallet_to_select">Кошелёк <br>(куда):</label>
+            <select id="wallet_to_select" name="wallet_to">
+              <option disabled selected value="">Выберите кошелёк</option>
+              {% for wallet in wallets %}
+              <option value="{{ wallet.name }}">
+                {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="horizontal-container">
+          <div>
+            <label for="accounting_type">Категория:</label>
+            <select id="accounting_type" name="accounting_type" required>
+              <option disabled selected value="">Выберите категорию</option>
+            </select>
+          </div>
+          <div>
+            <label for="account_type">Контрагенты:</label>
+            <select id="account_type" name="account_type">
+              <option value="" selected>Не выбрано</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="date_finish">Дата назначения:</label>
+          <input id="date_finish" name="date_finish" required type="date" />
+        </div>
+
+        <div class="horizontal-container">
+          <div>
+            <label for="amount">Сумма:</label>
+            <input
+              id="amount"
+              name="amount"
+              placeholder="Введите сумму"
+              required
+              type="number"
+            />
+          </div>
+          <div>
+            <label class="payment-type-label" for="payment_type">Способ оплаты:</label>
+            <select id="payment_type" name="payment_type" required>
+              <option disabled selected value="">Выберите тип оплаты</option>
+              {% for payment_type in payment_types %}
+              <option value="{{ payment_type.name }}">
+                {{ payment_type.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <label for="comment">Назначение платежа:</label>
+        <textarea
+          id="comment"
+          name="comment"
+          placeholder="Введите комментарий"
+        ></textarea>
+
+        <div id="wallet">
+          <label for="wallet_select">Кошелёк:</label>
+          <select id="wallet_select" name="wallet">
+            <option disabled selected value="">Выберите кошелёк</option>
+            {% for wallet in wallets %}
+            <option value="{{ wallet.name }}">
+              {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button id="submitButton" type="submit">Отправить</button>
+      </form>
+      <div class="loader" id="loader"></div>
+      <div class="success-message" id="successMessage">
+        Данные успешно загружены!
+      </div>
+    </div>
+
+    <div class="detailing" id="detailModal">
+      <div class="modal-scroll-wrapper">
+        <div class="detailing-content">
+        <div class="header">
+          <img alt="Логотип" src="/static/img/лого.png" />
+          <h1>Детализация</h1>
+        </div>
+        <div class="detailing-body" id="detailingBody">
+          <!-- Financial operations will be dynamically inserted here -->
+        </div>
+        <div class="detailing-footer">
+          <button id="closeModalBtn" type="button">Назад</button>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="edit-modal" id="editModal">
+      <div class="modal-scroll-wrapper">
+        <div class="edit-modal-content">
+          <div class="header">
+            <img alt="Логотип" src="/static/img/лого.png" />
+            <h3 style="">Редактирование финансовой операции</h3>
+          </div>
+          <span class="close-btn" id="closeEditModalBtn">&times;</span>
+          <form id="editForm">
+            <div>
+              <input type="hidden" id="editIndex" />
+              <input type="hidden" id="editOperationId" name="operation_id" />
+
+              <label for="edit_date">Дата:</label>
+              <input id="edit_date" name="date" required type="date" />
+              <label for="edit_operation_type">Вид операции:</label>
+              <select id="edit_operation_type" name="operation_type" disabled required>
+                <option disabled value="">Выберите вид операции</option>
+                {% for operation in operations %}
+                <option value="{{ operation.name }}">{{ operation.name }}</option>
+                {% endfor %}
+              </select>
+
+              <div class="horizontal-container">
+                <div id="edit_wallet_from" style="display: none">
+                  <label for="edit_wallet_from_select">Кошелёк <br>(откуда):</label>
+                  <select id="edit_wallet_from_select" name="wallet_from" disabled>
+                    <option disabled selected value="">Выберите кошелёк</option>
+                    {% for wallet in wallets %}
+                    <option value="{{ wallet.name }}">
+                      {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div id="edit_wallet_to" style="display: none">
+                  <label for="edit_wallet_to_select">Кошелёк <br>(куда):</label>
+                  <select id="edit_wallet_to_select" name="wallet_to" disabled>
+                    <option disabled selected value="">Выберите кошелёк</option>
+                    {% for wallet in wallets %}
+                    <option value="{{ wallet.name }}">
+                      {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <div class="horizontal-container">
+                <div>
+                  <label for="edit_accounting_type">Категория:</label>
+                  <select id="edit_accounting_type" name="accounting_type" required>
+                    <option disabled selected value="">Выберите категорию</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="edit_account_type">Статья:</label>
+                  <select id="edit_account_type" name="account_type">
+                    <option value="" selected>Не выбрано</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="edit_date_finish">Дата назначения:</label>
+                <input id="edit_date_finish" name="date_finish" required type="date" />
+              </div>
+
+              <div class="horizontal-container">
+                <div>
+                  <label for="edit_amount">Сумма:</label>
+                  <input
+                    id="edit_amount"
+                    name="amount"
+                    placeholder="Введите сумму"
+                    required
+                    type="number"
+                  />
+                </div>
+                <div>
+                  <label class="payment-type-label" for="edit_payment_type">Способ оплаты:</label>
+                  <select id="edit_payment_type" name="payment_type" required>
+                    <option disabled selected value="">Выберите тип оплаты</option>
+                    {% for payment_type in payment_types %}
+                    <option value="{{ payment_type.name }}">
+                      {{ payment_type.name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <label for="edit_comment">Назначение платежа:</label>
+              <textarea
+                id="edit_comment"
+                name="comment"
+                placeholder="Введите комментарий"
+              ></textarea>
+
+              <div id="edit_wallet">
+                <label for="edit_wallet_select">Кошелёк:</label>
+                <select id="edit_wallet_select" name="wallet" disabled>
+                  <option disabled selected value="">Выберите кошелёк</option>
+                  {% for wallet in wallets %}
+                  <option value="{{ wallet.name }}">
+                    {{ wallet.name }} ({{ wallet.username }}) {{ wallet.balance }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="detailing-footer">
+              <button type="submit" id="saveEditBtn" class="save-btn" disabled>Сохранить</button>
+              <button type="button" id="deleteBtn" class="delete-btn" aria-label="Удалить">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+            </div>
+            <div class="loader" id="editLoader"></div>
+            <div class="success-message" id="editSuccessMessage">
+              Данные успешно обновлены!
+            </div>
+          </form>
+      </div>
+      </div>
+    </div>
+
+    <script>
+      const categoryArticles = {{ category_articles|tojson }};
+      const operationCategories = {{ operation_categories|tojson }};
+      let financialOperations = {{ financial_operations|tojson }};
+
+      const detailBtn = document.getElementById('detailBtn');
+      const detailModal = document.getElementById('detailModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const editModal = document.getElementById('editModal');
+      const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+      const saveEditBtn = document.getElementById('saveEditBtn');
+      const deleteBtn = document.getElementById('deleteBtn');
+      const editForm = document.getElementById('editForm');
+      const financialForm = document.getElementById('financialForm');
+
+      // Set initial dates on page load
+      window.addEventListener('load', () => {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById('date').value = today;
+        document.getElementById('date_finish').value = today;
+        document.getElementById('edit_date').value = today;
+      });
+
+      detailBtn.addEventListener('click', () => {
+        renderFinancialOperations();
+        detailModal.style.display = 'flex';
+      });
+
+      closeModalBtn.addEventListener('click', () => {
+        location.reload();
+      });
+
+      closeEditModalBtn.addEventListener('click', () => {
+        editModal.style.display = 'none';
+      });
+
+
+      closeEditModalBtn.addEventListener('click', () => {
+        editModal.style.display = 'none';
+      });
+
+      function renderFinancialOperations() {
+        const detailingBody = document.getElementById('detailingBody');
+        detailingBody.innerHTML = '';
+
+        financialOperations.forEach((operation, index) => {
+          const button = document.createElement('button');
+          button.className = 'modal-button';
+          button.dataset.index = index;
+
+          const numberSpan = document.createElement('span');
+          numberSpan.className = 'number';
+          numberSpan.textContent = `${index + 1}. `;
+
+          const dateSpan = document.createElement('span');
+          dateSpan.className = 'date';
+          dateSpan.textContent = operation.operation_date || '';
+
+          const operationSpan = document.createElement('span');
+          operationSpan.className = 'operation';
+          operationSpan.textContent = operation.operation_type || '';
+
+          const categorySpan = document.createElement('span');
+          categorySpan.className = 'category';
+          categorySpan.textContent = operation.accounting_type || '';
+
+          const amountSpan = document.createElement('span');
+          amountSpan.className = 'amount';
+          amountSpan.textContent = operation.amount
+            ? parseFloat(operation.amount) % 1 === 0
+              ? parseInt(operation.amount).toString()
+              : operation.amount.toString()
+            : '';
+
+          button.appendChild(numberSpan);
+          button.appendChild(dateSpan);
+          button.appendChild(operationSpan);
+          button.appendChild(categorySpan);
+          button.appendChild(amountSpan);
+
+          button.addEventListener('click', () => openEditModal(index));
+
+          detailingBody.appendChild(button);
+        });
+      }
+
+      let originalOperationData = {};
+
+      function openEditModal(index) {
+        const operation = financialOperations[index];
+        originalOperationData = { ...operation };
+
+        document.getElementById('editIndex').value = index;
+        document.getElementById('editOperationId').value = operation.id || '';
+
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById('edit_date').value = operation.operation_date
+          ? operation.operation_date.split('.').reverse().join('-')
+          : today;
+
+        document.getElementById('edit_date_finish').value = operation.date_finish
+          ? operation.date_finish.split('.').reverse().join('-')
+          : today;
+
+        document.getElementById('edit_operation_type').value = operation.operation_type || '';
+        const operationTypeEvent = new Event('change');
+        document.getElementById('edit_operation_type').dispatchEvent(operationTypeEvent);
+
+        setTimeout(() => {
+          document.getElementById('edit_accounting_type').value = operation.accounting_type || '';
+          const accountingTypeEvent = new Event('change');
+          document.getElementById('edit_accounting_type').dispatchEvent(accountingTypeEvent);
+
+          setTimeout(() => {
+            document.getElementById('edit_account_type').value = operation.account_type || '';
+          }, 0);
+        }, 0);
+
+        document.getElementById('edit_amount').value = operation.amount || '';
+        document.getElementById('edit_payment_type').value = operation.payment_type || '';
+        document.getElementById('edit_comment').value = operation.comment || '';
+        document.getElementById('edit_wallet_select').value = operation.wallet || '';
+        document.getElementById('edit_wallet_from_select').value = operation.wallet_from || '';
+        document.getElementById('edit_wallet_to_select').value = operation.wallet_to || '';
+
+        saveEditBtn.disabled = true;
+        editModal.style.display = 'flex';
+      }
+
+      editForm.querySelectorAll('input, select, textarea').forEach(input => {
+          input.addEventListener('input', () => {
+              const currentData = getFormData();
+              const hasChanges = Object.keys(currentData).some(key =>
+                  currentData[key] !== originalOperationData[key]
+              );
+              saveEditBtn.disabled = !hasChanges;
+          });
+      });
+
+      function getFormData() {
+        const operation_date = document.getElementById('edit_date').value.split('-').reverse().join('.');
+        const date_finish = document.getElementById('edit_date_finish').value.split('-').reverse().join('.');
+        return {
+          operation_date: operation_date || '',
+          operation_type: document.getElementById('edit_operation_type').value || '',
+          accounting_type: document.getElementById('edit_accounting_type').value || '',
+          account_type: document.getElementById('edit_account_type').value || '',
+          amount: document.getElementById('edit_amount').value || '',
+          payment_type: document.getElementById('edit_payment_type').value || '',
+          comment: document.getElementById('edit_comment').value || '',
+          wallet: document.getElementById('edit_wallet_select').value || '',
+          wallet_from: document.getElementById('edit_wallet_from_select').value || '',
+          wallet_to: document.getElementById('edit_wallet_to_select').value || '',
+          date_finish: date_finish || ''
+        };
+      }
+
+      deleteBtn.addEventListener('click', () => {
+        const index = parseInt(document.getElementById('editIndex').value);
+        const operationId = document.getElementById('editOperationId').value;
+        const operation = financialOperations[index];
+
+        document.getElementById('editLoader').style.display = 'block';
+        document.getElementById('editSuccessMessage').style.display = 'none';
+        document.getElementById('saveEditBtn').disabled = true;
+        document.getElementById('deleteBtn').disabled = true;
+
+        fetch(`/delete/${operationId}`, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (!response.ok) {
+            alert(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('editLoader').style.display = 'none';
+          document.getElementById('editSuccessMessage').textContent = 'Операция успешно удалена!';
+          document.getElementById('editSuccessMessage').style.display = 'block';
+          document.getElementById('saveEditBtn').disabled = false;
+          document.getElementById('deleteBtn').disabled = false;
+
+          const amount = parseFloat(operation.amount) || 0;
+          const operationType = operation.operation_type.toLowerCase();
+
+          function updateBalanceInSelect(walletValue, amountChange) {
+              const selects = [
+                  document.getElementById('wallet_select'),
+                  document.getElementById('edit_wallet_select'),
+                  document.getElementById('wallet_from_select'),
+                  document.getElementById('edit_wallet_from_select'),
+                  document.getElementById('wallet_to_select'),
+                  document.getElementById('edit_wallet_to_select')
+              ].filter(sel => sel !== null);
+
+              selects.forEach(select => {
+                  const option = Array.from(select.options).find(opt => opt.value === walletValue);
+                  if (option) {
+                      const parts = option.text.split(' ');
+                      const currentBalance = parseFloat(parts[parts.length - 1]);
+                      const newBalance = currentBalance + amountChange;
+                      option.text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+                  }
+              });
+          }
+
+          if (operationType === 'расход') {
+              updateBalanceInSelect(operation.wallet, amount);
+          } else if (operationType === 'приход') {
+              updateBalanceInSelect(operation.wallet, -amount);
+          } else if (operationType === 'перемещение') {
+              updateBalanceInSelect(operation.wallet_from, amount);
+              updateBalanceInSelect(operation.wallet_to, -amount);
+          }
+
+          financialOperations.splice(index, 1);
+
+          renderFinancialOperations();
+
+          setTimeout(() => {
+              document.getElementById('editSuccessMessage').style.display = 'none';
+              editModal.style.display = 'none';
+          }, 3000);
+        })
+        .catch(error => {
+            document.getElementById('editLoader').style.display = 'none';
+            document.getElementById('saveEditBtn').disabled = false;
+            document.getElementById('deleteBtn').disabled = false;
+            alert('Произошла ошибка при удалении: ' + error.message);
+        });
+      });
+
+     editForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const index = parseInt(document.getElementById('editIndex').value);
+        const editOperationId = document.getElementById('editOperationId').value;
+        const operationType = document.getElementById('edit_operation_type').value;
+        const amount = parseFloat(document.getElementById('edit_amount').value);
+        const originalOperation = financialOperations[index];
+        const originalAmount = parseFloat(originalOperation.amount) || 0;
+
+        if (operationType === "Расход") {
+            const walletSelect = document.getElementById('edit_wallet_select');
+            const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+            const parts = selectedLabel.split(' ');
+            const currentBalance = parseFloat(parts[parts.length - 1]);
+
+            if (currentBalance + originalAmount - amount < 0) {
+                alert('Ошибка: Сумма указана ниже баланса кошелька');
+                return;
+            }
+        } else if (operationType === "Перемещение") {
+            const walletSelect = document.getElementById('edit_wallet_from_select');
+            const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+            const parts = selectedLabel.split(' ');
+            const money = parseFloat(parts[parts.length - 1]);
+
+            if (money - amount < 0) {
+                alert('Ошибка: Сумма указана ниже баланса кошелька, откуда переводятся средства');
+                return;
+            }
+        }
+
+        document.getElementById('editLoader').style.display = 'block';
+        document.getElementById('editSuccessMessage').style.display = 'none';
+        document.getElementById('saveEditBtn').disabled = true;
+
+        const formData = new FormData(this);
+        const currentData = getFormData();
+
+        Object.keys(currentData).forEach((key) => {
+            if (currentData[key] === originalOperationData[key]) {
+                formData.delete(key);
+            }
+        });
+
+        fetch(`/edit/${editOperationId}`, {
+            method: 'PATCH',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('editLoader').style.display = 'none';
+            document.getElementById('editSuccessMessage').style.display = 'block';
+            document.getElementById('saveEditBtn').disabled = false;
+
+            const updatedData = getFormData();
+            financialOperations[index] = {
+                ...financialOperations[index],
+                ...updatedData
+            };
+
+            if (operationType === "Расход") {
+                const walletSelect = document.getElementById('edit_wallet_select');
+                const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+                const parts = selectedLabel.split(' ');
+                const currentBalance = parseFloat(parts[parts.length - 1]);
+
+                const newBalance = currentBalance + originalAmount - amount;
+                walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+            } else if (operationType === "Приход") {
+                const walletSelect = document.getElementById('edit_wallet_select');
+                const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+                const parts = selectedLabel.split(' ');
+                const currentBalance = parseFloat(parts[parts.length - 1]);
+
+                const newBalance = currentBalance - originalAmount + amount;
+                walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+            } else if (operationType === "Перемещение") {
+                const walletFromSelect = document.getElementById('edit_wallet_from_select');
+                const walletToSelect = document.getElementById('edit_wallet_to_select');
+
+                function updateBalanceInSelect(selectElement, value, amountChange) {
+                    const options = selectElement.options;
+                    for (let i = 0; i < options.length; i++) {
+                        if (options[i].value === value) {
+                            const text = options[i].text;
+                            const newText = text.replace(/(-?\d+\.\d{2})$/, (match) => {
+                                const newBalance = (parseFloat(match) + amountChange).toFixed(2);
+                                return newBalance;
+                            });
+                            options[i].text = newText;
+                            break;
+                        }
+                    }
+                }
+
+                const fromValue = walletFromSelect.value;
+                const toValue = walletToSelect.value;
+
+                updateBalanceInSelect(walletFromSelect, fromValue, originalAmount);
+                updateBalanceInSelect(walletToSelect, toValue, -originalAmount);
+                updateBalanceInSelect(walletFromSelect, fromValue, -amount);
+                updateBalanceInSelect(walletToSelect, toValue, amount);
+            }
+
+            renderFinancialOperations();
+
+            setTimeout(() => {
+                document.getElementById('editSuccessMessage').style.display = 'none';
+                editModal.style.display = 'none';
+            }, 3000);
+        })
+        .catch(error => {
+            document.getElementById('editLoader').style.display = 'none';
+            document.getElementById('saveEditBtn').disabled = false;
+            alert('Произошла ошибка: ' + error.message);
+        });
+    });
+
+      document.getElementById('edit_accounting_type').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        const accountTypeSelect = document.getElementById('edit_account_type');
+        accountTypeSelect.innerHTML = '<option value="" selected>Не выбрано</option>';
+
+        if (categoryArticles[selectedCategory]) {
+          categoryArticles[selectedCategory].forEach(article => {
+            const option = document.createElement('option');
+            option.value = article;
+            option.textContent = article;
+            accountTypeSelect.appendChild(option);
+          });
+        }
+      });
+
+      document.getElementById('edit_operation_type').addEventListener('change', function() {
+        const selectedOperation = this.value;
+        const categorySelect = document.getElementById('edit_accounting_type');
+        const accountTypeSelect = document.getElementById('edit_account_type');
+        const paymentTypeField = document.getElementById('edit_payment_type').parentElement;
+        const walletFromField = document.getElementById('edit_wallet_from');
+        const walletToField = document.getElementById('edit_wallet_to');
+        const walletField = document.getElementById('edit_wallet');
+        const dateFinishInput = document.getElementById('edit_date_finish');
+        const dateFinishField = dateFinishInput.parentElement;
+
+        categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
+        accountTypeSelect.innerHTML = '<option value="" selected>Не выбрано</option>';
+
+        if (operationCategories[selectedOperation]) {
+          operationCategories[selectedOperation].forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+          });
+        }
+
+        if (selectedOperation === 'Перемещение') {
+          dateFinishField.style.display = 'none';
+          dateFinishInput.removeAttribute('required');
+          paymentTypeField.style.display = 'none';
+          categorySelect.parentElement.style.display = 'none';
+          accountTypeSelect.parentElement.style.display = 'none';
+          walletField.style.display = 'none';
+          walletFromField.style.display = 'block';
+          walletToField.style.display = 'block';
+          categorySelect.required = false;
+          accountTypeSelect.required = false;
+          paymentTypeField.querySelector('select').required = false;
+        } else {
+          dateFinishField.style.display = 'block';
+          dateFinishInput.required = true;
+          paymentTypeField.style.display = 'block';
+          categorySelect.parentElement.style.display = 'block';
+          accountTypeSelect.parentElement.style.display = 'block';
+          walletField.style.display = 'block';
+          walletFromField.style.display = 'none';
+          walletToField.style.display = 'none';
+          categorySelect.required = true;
+          accountTypeSelect.required = false;
+          paymentTypeField.querySelector('select').required = true;
+        }
+      });
+
+      document.getElementById('accounting_type').addEventListener('change', function() {
+          const selectedCategory = this.value;
+          const accountTypeSelect = document.getElementById('account_type');
+          accountTypeSelect.innerHTML = '<option value="" selected>Не выбрано</option>';
+
+          if (categoryArticles[selectedCategory]) {
+              categoryArticles[selectedCategory].forEach(article => {
+                  const option = document.createElement('option');
+                  option.value = article;
+                  option.textContent = article;
+                  accountTypeSelect.appendChild(option);
+              });
+          }
+      });
+
+      document.getElementById('operation_type').addEventListener('change', function() {
+          const selectedOperation = this.value;
+          const categorySelect = document.getElementById('accounting_type');
+          const accountTypeSelect = document.getElementById('account_type');
+          const dateFinishInput = document.getElementById('date_finish');
+          const dateFinishField = dateFinishInput.parentElement;
+          const paymentTypeField = document.getElementById('payment_type').parentElement;
+          const walletFromField = document.getElementById('wallet_from');
+          const walletToField = document.getElementById('wallet_to');
+          const walletField = document.getElementById('wallet');
+
+          categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
+          accountTypeSelect.innerHTML = '<option value="" selected>Не выбрано</option>';
+
+          if (operationCategories[selectedOperation]) {
+              operationCategories[selectedOperation].forEach(category => {
+                  const option = document.createElement('option');
+                  option.value = category;
+                  option.textContent = category;
+                  categorySelect.appendChild(option);
+              });
+          }
+
+          if (selectedOperation === 'Перемещение') {
+              // Hide fields not needed for "Перемещение"
+              dateFinishField.style.display = 'none';
+              paymentTypeField.style.display = 'none';
+              categorySelect.parentElement.style.display = 'none';
+              accountTypeSelect.parentElement.style.display = 'none';
+              walletField.style.display = 'none';
+
+              // Show fields specific to "Перемещение"
+              walletFromField.style.display = 'block';
+              walletToField.style.display = 'block';
+
+              // Remove required attribute for hidden fields
+              categorySelect.required = false;
+              accountTypeSelect.required = false;
+              dateFinishInput.removeAttribute('required');
+              paymentTypeField.querySelector('select').required = false;
+
+              // Reset values for hidden fields
+              categorySelect.value = '';
+              accountTypeSelect.value = '';
+              dateFinishInput.setAttribute('required', 'required');
+              paymentTypeField.querySelector('select').value = '';
+          } else {
+              dateFinishField.style.display = 'block';
+              paymentTypeField.style.display = 'block';
+              categorySelect.parentElement.style.display = 'block';
+              accountTypeSelect.parentElement.style.display = 'block';
+              walletField.style.display = 'block';
+
+              walletFromField.style.display = 'none';
+              walletToField.style.display = 'none';
+
+              categorySelect.required = true;
+              accountTypeSelect.required = false; // Убрали обязательность выбора контрагента
+              dateFinishInput.required = true;
+              paymentTypeField.querySelector('select').required = true;
+          }
+      });
+
+      financialForm.addEventListener('submit', function(event) {
+          const dateValue = document.getElementById('date').value;
+          const dateFinishValue = document.getElementById('date_finish').value;
+          event.preventDefault();
+          document.getElementById('loader').style.display = 'block';
+          document.getElementById('successMessage').style.display = 'none';
+          document.getElementById('submitButton').disabled = true;
+
+          const operationType = document.getElementById('operation_type').value;
+          const amount = parseFloat(document.getElementById('amount').value);
+
+          if (operationType === "Расход") {
+              const walletSelect = document.getElementById('wallet_select');
+              const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+              const parts = selectedLabel.split(' ');
+              const money = parseFloat(parts[parts.length - 1]);
+
+              if (money - amount < 0) {
+                  alert('Ошибка: Сумма указана ниже баланса кошелька');
+                  document.getElementById('loader').style.display = 'none';
+                  document.getElementById('submitButton').disabled = false;
+                  return;
+              }
+          } else if (operationType === "Перемещение") {
+              const walletSelect = document.getElementById('wallet_from_select');
+              const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+              const parts = selectedLabel.split(' ');
+              const money = parseFloat(parts[parts.length - 1]);
+
+              if (money - amount < 0) {
+                  alert('Ошибка: Сумма указана ниже баланса кошелька, откуда переводятся средства');
+                  document.getElementById('loader').style.display = 'none';
+                  document.getElementById('submitButton').disabled = false;
+                  return;
+              }
+          }
+
+          const formData = new FormData(this);
+
+          fetch('/submit', {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.text())
+          .then(html => {
+              document.getElementById('loader').style.display = 'none';
+              document.getElementById('successMessage').style.display = 'block';
+              document.getElementById('submitButton').disabled = false;
+
+
+              setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+                location.reload();
+              }, 3000);
+
+              if (operationType === "Расход") {
+                  const walletSelect = document.getElementById('wallet_select');
+                  const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+                  const parts = selectedLabel.split(' ');
+                  const currentBalance = parseFloat(parts[parts.length - 1]);
+                  const newBalance = currentBalance - amount;
+
+                  walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+              } else if (operationType === "Приход") {
+                  const walletSelect = document.getElementById('wallet_select');
+                  const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
+                  const parts = selectedLabel.split(' ');
+                  const currentBalance = parseFloat(parts[parts.length - 1]);
+                  const newBalance = currentBalance + amount;
+
+                  walletSelect.options[walletSelect.selectedIndex].text = `${parts[0]} (${parts[1]}) ${newBalance.toFixed(2)}`;
+              } else if (operationType === "Перемещение") {
+                  const walletFromSelect = document.getElementById('wallet_from_select');
+                  const walletToSelect = document.getElementById('wallet_to_select');
+
+                  function updateBalanceInSelect(selectElement, value, amountChange) {
+                      const options = selectElement.options;
+                      for (let i = 0; i < options.length; i++) {
+                          if (options[i].value === value) {
+                              const text = options[i].text;
+                              const newText = text.replace(/(-?\d+\.\d{2})$/, (match) => {
+                                  const newBalance = (parseFloat(match) + amountChange).toFixed(2);
+                                  return newBalance;
+                              });
+                              options[i].text = newText;
+                              break;
+                          }
+                      }
+                  }
+
+                  const fromValue = walletFromSelect.value;
+                  const toValue = walletToSelect.value;
+
+                  updateBalanceInSelect(walletFromSelect, fromValue, -amount);
+                  updateBalanceInSelect(walletToSelect, toValue, amount);
+
+                  updateBalanceInSelect(walletToSelect, fromValue, -amount);
+                  updateBalanceInSelect(walletFromSelect, toValue, amount);
+              }
+
+              this.reset();
+              document.getElementById('date').value = dateValue || new Date().toISOString().split("T")[0];
+              document.getElementById('date_finish').value = dateFinishValue || new Date().toISOString().split("T")[0];
+
+          })
+          .catch(error => {
+              document.getElementById('loader').style.display = 'none';
+              document.getElementById('submitButton').disabled = false;
+              alert('Произошла ошибка: ' + error.message);
+          });
+      });
+    </script>
+  </body>
+</html>
