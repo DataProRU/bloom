@@ -1,0 +1,13 @@
+[Unit]
+Description=Telegram Bot
+After=network.target
+
+[Service]
+WorkingDirectory=/root/bloom
+ExecStart=/root/bloom/.venv/bin/python3 bot.py
+Restart=always
+StandardOutput=/root/bloom/bot.log
+StandardError=/root/bloom/bot_error.log
+
+[Install]
+WantedBy=multi-user.target

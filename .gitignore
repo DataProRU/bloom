@@ -13,3 +13,7 @@ venv/
 eq_rental.db
 
 .env
+uvicorn.log
+uvicorn_error.log
+bot.log
+bot_error.log
