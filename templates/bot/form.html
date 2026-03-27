@@ -445,7 +445,7 @@
         <div class="horizontal-container">
           <div id="wallet_from" style="display: none">
             <label for="wallet_from_select">Кошелёк <br>(откуда):</label>
-            <select id="wallet_from_select" name="wallet_from">
+            <select id="wallet_from_select" name="wallet_from" required>
               <option disabled selected value="">Выберите кошелёк</option>
               {% for wallet in wallets %}
               <option value="{{ wallet.name }}">
@@ -457,7 +457,7 @@
 
           <div id="wallet_to" style="display: none">
             <label for="wallet_to_select">Кошелёк <br>(куда):</label>
-            <select id="wallet_to_select" name="wallet_to">
+            <select id="wallet_to_select" name="wallet_to" required>
               <option disabled selected value="">Выберите кошелёк</option>
               {% for wallet in wallets %}
               <option value="{{ wallet.name }}">
@@ -521,7 +521,7 @@
 
         <div id="wallet">
           <label for="wallet_select">Кошелёк:</label>
-          <select id="wallet_select" name="wallet">
+          <select id="wallet_select" name="wallet" required>
             <option disabled selected value="">Выберите кошелёк</option>
             {% for wallet in wallets %}
             <option value="{{ wallet.name }}">
@@ -582,7 +582,7 @@
               <div class="horizontal-container">
                 <div id="edit_wallet_from" style="display: none">
                   <label for="edit_wallet_from_select">Кошелёк <br>(откуда):</label>
-                  <select id="edit_wallet_from_select" name="wallet_from" disabled>
+                  <select id="edit_wallet_from_select" name="wallet_from" disabled required>
                     <option disabled selected value="">Выберите кошелёк</option>
                     {% for wallet in wallets %}
                     <option value="{{ wallet.name }}">
@@ -594,7 +594,7 @@
 
                 <div id="edit_wallet_to" style="display: none">
                   <label for="edit_wallet_to_select">Кошелёк <br>(куда):</label>
-                  <select id="edit_wallet_to_select" name="wallet_to" disabled>
+                  <select id="edit_wallet_to_select" name="wallet_to" disabled required>
                     <option disabled selected value="">Выберите кошелёк</option>
                     {% for wallet in wallets %}
                     <option value="{{ wallet.name }}">
@@ -658,7 +658,7 @@
 
               <div id="edit_wallet">
                 <label for="edit_wallet_select">Кошелёк:</label>
-                <select id="edit_wallet_select" name="wallet" disabled>
+                <select id="edit_wallet_select" name="wallet" disabled required>
                   <option disabled selected value="">Выберите кошелёк</option>
                   {% for wallet in wallets %}
                   <option value="{{ wallet.name }}">
@@ -931,6 +931,18 @@
         const originalOperation = financialOperations[index];
         const originalAmount = parseFloat(originalOperation.amount) || 0;
 
+        if ((operationType === "Приход" || operationType === "Расход") && !document.getElementById('edit_wallet_select').value) {
+            alert('Ошибка: Для операции "Приход" и "Расход" поле "Кошелёк" обязательно.');
+            return;
+        }
+
+        if (operationType === "Перемещение") {
+            if (!document.getElementById('edit_wallet_from_select').value || !document.getElementById('edit_wallet_to_select').value) {
+                alert('Ошибка: Для операции "Перемещение" поля "Кошелёк (откуда)" и "Кошелёк (куда)" обязательны.');
+                return;
+            }
+        }
+
         if (operationType === "Расход") {
             const walletSelect = document.getElementById('edit_wallet_select');
             const selectedLabel = walletSelect.options[walletSelect.selectedIndex].text;
@@ -1068,6 +1080,9 @@
         const walletFromField = document.getElementById('edit_wallet_from');
         const walletToField = document.getElementById('edit_wallet_to');
         const walletField = document.getElementById('edit_wallet');
+        const walletSelect = document.getElementById('edit_wallet_select');
+        const walletFromSelect = document.getElementById('edit_wallet_from_select');
+        const walletToSelect = document.getElementById('edit_wallet_to_select');
         const dateFinishInput = document.getElementById('edit_date_finish');
         const dateFinishField = dateFinishInput.parentElement;
 
@@ -1095,6 +1110,9 @@
           categorySelect.required = false;
           accountTypeSelect.required = false;
           paymentTypeField.querySelector('select').required = false;
+          walletSelect.required = false;
+          walletFromSelect.required = true;
+          walletToSelect.required = true;
         } else {
           dateFinishField.style.display = 'block';
           dateFinishInput.required = true;
@@ -1107,6 +1125,9 @@
           categorySelect.required = true;
           accountTypeSelect.required = false;
           paymentTypeField.querySelector('select').required = true;
+          walletSelect.required = true;
+          walletFromSelect.required = false;
+          walletToSelect.required = false;
         }
       });
 
@@ -1135,6 +1156,9 @@
           const walletFromField = document.getElementById('wallet_from');
           const walletToField = document.getElementById('wallet_to');
           const walletField = document.getElementById('wallet');
+          const walletSelect = document.getElementById('wallet_select');
+          const walletFromSelect = document.getElementById('wallet_from_select');
+          const walletToSelect = document.getElementById('wallet_to_select');
 
           categorySelect.innerHTML = '<option value="" disabled selected>Выберите категорию</option>';
           accountTypeSelect.innerHTML = '<option value="" selected>Не выбрано</option>';
@@ -1165,6 +1189,9 @@
               accountTypeSelect.required = false;
               dateFinishInput.removeAttribute('required');
               paymentTypeField.querySelector('select').required = false;
+              walletSelect.required = false;
+              walletFromSelect.required = true;
+              walletToSelect.required = true;
 
               // Reset values for hidden fields
               categorySelect.value = '';
@@ -1185,6 +1212,9 @@
               accountTypeSelect.required = false; // Убрали обязательность выбора контрагента
               dateFinishInput.required = true;
               paymentTypeField.querySelector('select').required = true;
+              walletSelect.required = true;
+              walletFromSelect.required = false;
+              walletToSelect.required = false;
           }
       });
 
@@ -1198,6 +1228,22 @@
 
           const operationType = document.getElementById('operation_type').value;
           const amount = parseFloat(document.getElementById('amount').value);
+
+          if ((operationType === "Приход" || operationType === "Расход") && !document.getElementById('wallet_select').value) {
+              alert('Ошибка: Для операции "Приход" и "Расход" поле "Кошелёк" обязательно.');
+              document.getElementById('loader').style.display = 'none';
+              document.getElementById('submitButton').disabled = false;
+              return;
+          }
+
+          if (operationType === "Перемещение") {
+              if (!document.getElementById('wallet_from_select').value || !document.getElementById('wallet_to_select').value) {
+                  alert('Ошибка: Для операции "Перемещение" поля "Кошелёк (откуда)" и "Кошелёк (куда)" обязательны.');
+                  document.getElementById('loader').style.display = 'none';
+                  document.getElementById('submitButton').disabled = false;
+                  return;
+              }
+          }
 
           if (operationType === "Расход") {
               const walletSelect = document.getElementById('wallet_select');
