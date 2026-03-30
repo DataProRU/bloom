@@ -36,8 +36,8 @@ try:
     sht2 = gc.open_by_url(
         os.getenv("GOOGLE_TABLES_URL")
     )
-    worksheet = sht2.get_worksheet(0)
-    balances_worksheet = sht2.get_worksheet(1)
+    worksheet = sht2.worksheet("Журнал операций")
+    balances_worksheet = sht2.worksheet("Балансы")
 except Exception as e:
     print(f"Ошибка при инициализации gspread: {str(e)}")
 
