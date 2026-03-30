@@ -504,11 +504,15 @@ async def delete_operation(
             row_data[-1] = operation_id
             worksheet.append_row(row_data, value_input_option="USER_ENTERED")
         else:
-            row_data.append(row.wallet)
+            # row.wallet может быть NULL в базе (старые/битые записи) — в таблицу пишем пусто
+            row_data.append(row.wallet or "")
             row_data.append(operation_id)
             worksheet.append_row(row_data, value_input_option="USER_ENTERED")
 
-        if original_operation_type == "расход":
+        # Балансы корректируем только если нужные кошельки указаны
+        if original_operation_type in ("расход", "приход") and not row.wallet:
+            logger.warning(f"Удаление operation_id {operation_id}: wallet is None for type={original_operation_type}, skip balance update")
+        elif original_operation_type == "расход":
             wallet_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == row.wallet))
             if wallet_instance:
                 new_balance = wallet_instance.balance + amount_decimal
@@ -525,21 +529,27 @@ async def delete_operation(
             else:
                 raise HTTPException(status_code=404, detail=f"Wallet {row.wallet} not found")
         elif original_operation_type == "перемещение":
-            wallet_from_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == row.wallet_from))
-            if wallet_from_instance:
-                new_balance = wallet_from_instance.balance + amount_decimal
-                query = Wallets.__table__.update().where(Wallets.name == row.wallet_from).values(balance=new_balance)
-                await db.execute(query)
+            if not row.wallet_from or not row.wallet_to:
+                logger.warning(
+                    f"Удаление operation_id {operation_id}: wallet_from/wallet_to is None for transfer, skip balance update "
+                    f"(wallet_from={row.wallet_from}, wallet_to={row.wallet_to})"
+                )
             else:
-                raise HTTPException(status_code=404, detail=f"Wallet from {row.wallet_from} not found")
+                wallet_from_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == row.wallet_from))
+                if wallet_from_instance:
+                    new_balance = wallet_from_instance.balance + amount_decimal
+                    query = Wallets.__table__.update().where(Wallets.name == row.wallet_from).values(balance=new_balance)
+                    await db.execute(query)
+                else:
+                    raise HTTPException(status_code=404, detail=f"Wallet from {row.wallet_from} not found")
 
-            wallet_to_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == row.wallet_to))
-            if wallet_to_instance:
-                new_balance = wallet_to_instance.balance - amount_decimal
-                query = Wallets.__table__.update().where(Wallets.name == row.wallet_to).values(balance=new_balance)
-                await db.execute(query)
-            else:
-                raise HTTPException(status_code=404, detail=f"Wallet to {row.wallet_to} not found")
+                wallet_to_instance = await db.fetch_one(Wallets.__table__.select().where(Wallets.name == row.wallet_to))
+                if wallet_to_instance:
+                    new_balance = wallet_to_instance.balance - amount_decimal
+                    query = Wallets.__table__.update().where(Wallets.name == row.wallet_to).values(balance=new_balance)
+                    await db.execute(query)
+                else:
+                    raise HTTPException(status_code=404, detail=f"Wallet to {row.wallet_to} not found")
 
         num_rows = len(worksheet.get_all_values())
         num_cols = len(worksheet.get_all_values()[0]) if num_rows > 0 else 0
